@@ -46,9 +46,8 @@ public final class Matrix {
         return null;
     }
 
-    public Vector getRow(int i) {
-        // TODO
-        return null;
+    public double[] getRow(int i) {
+        return matrix[i];
     }
 
     /**
@@ -59,6 +58,8 @@ public final class Matrix {
         return height;
     }
 
+    public int getRows() { return getHeight(); }
+
     /**
      * Get's the width of the matrix.
      * @return number of columns in matrix
@@ -66,6 +67,8 @@ public final class Matrix {
     public int getWidth() {
         return width;
     }
+
+    public int getCols() { return getWidth(); }
 
     /**
      * Gets String representation of matrix.

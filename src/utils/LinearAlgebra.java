@@ -49,16 +49,7 @@ public class LinearAlgebra {
      * @return the matrix sum
      * @throws IllegalOperandException when dimensions don't match
      */
-    public static Matrix matrixAdd(Matrix m1, Matrix m2) throws
-        IllegalOperandException {
-
-        if (m1.getHeight() != m2.getHeight() || m1.getWidth() != m2.getWidth())
-        {
-            String s = "Cannot add together two matrices of different "
-                + "dimensions. (" + m1.getHeight() + "x" + m1.getWidth()
-                + " and " + m2.getHeight() + "x" + m2.getWidth() + ")";
-            throw new IllegalOperandException(s);
-        }
+    public static Matrix matrixAdd(Matrix m1, Matrix m2) {
 
         double[][] sum = new double[m1.getHeight()][m1.getWidth()];
         for (int i = 0; i < m1.getHeight(); i++) {
@@ -67,6 +58,37 @@ public class LinearAlgebra {
             }
         }
         return new Matrix(sum);
+    }
+
+    /**
+     * Adds two matrices together and returns the resulting matrix.
+     *
+     * @param m1 - first matrix
+     * @param m2 - second matrix
+     * @return the matrix sum
+     * @throws IllegalOperandException when dimensions don't match
+     */
+    public static Matrix matrixSubtract(Matrix m1, Matrix m2) {
+
+        double[][] diff = new double[m1.getHeight()][m1.getWidth()];
+        for (int i = 0; i < m1.getHeight(); i++) {
+            for (int j = 0; j < m1.getWidth(); j++) {
+                diff[i][j] = m1.get(i, j) - m2.get(i, j);
+            }
+        }
+        return new Matrix(diff);
+    }
+
+    public static Matrix matrixMultiply(Matrix a, Matrix b) {
+        double[][] r = new double[a.getRows()][b.getCols()];
+        for (int i = 0; i < r.length; i++) {
+            for (int j = 0; j < r[0].length; j++) {
+                for (int k = 0; k < a.getCols(); k++) {
+                    r[i][j] += a.get(i, k) * b.get(k, j);
+                }
+            }
+        }
+        return new Matrix(r);
     }
 
     /**
