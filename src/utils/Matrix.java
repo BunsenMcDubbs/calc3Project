@@ -6,25 +6,20 @@
  */
 package utils;
 
-public final class Matrix {
+public final class Matrix extends AbstractMatrix{
 
     /*
     Create final instance variables
     */
     private final double[][] matrix;
-    private final int height;
-    private final int width;
 
     /**
      * Initialize instance variables
      * @param matrix 2D array representation of Matrix
      */
     public Matrix(double[][] matrix) {
+        super(matrix.length, matrix[0].length);
         this.matrix = matrix;
-        height = matrix.length;
-        if (height == 0) {
-            width = 0;
-        } else { width = matrix[0].length; }
     }
 
     /**
@@ -41,51 +36,12 @@ public final class Matrix {
         }
     }
 
-    public Vector getCol(int i) {
+    public double[] getCol(int i) {
         // TODO
         return null;
     }
 
     public double[] getRow(int i) {
         return matrix[i];
-    }
-
-    /**
-     * Get's the height of the matrix.
-     * @return number of rows in matrix
-     */
-    public int getHeight() {
-        return height;
-    }
-
-    public int getRows() { return getHeight(); }
-
-    /**
-     * Get's the width of the matrix.
-     * @return number of columns in matrix
-     */
-    public int getWidth() {
-        return width;
-    }
-
-    public int getCols() { return getWidth(); }
-
-    /**
-     * Gets String representation of matrix.
-     * Columns separated by tabs, rows by new lines.
-     * @return String representation of matrix.
-     */
-    public String toString() {
-        String s = "";
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width - 1; j++) {
-                s += matrix[i][j] + "\t";
-            }
-            if (width > 0) {
-                s += matrix[i][width - 1];
-            }
-            s += "\n";
-        }
-        return s;
     }
 }

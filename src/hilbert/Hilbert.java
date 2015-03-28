@@ -30,93 +30,212 @@ public class Hilbert {
 
     /**
      * Finds the LU factorization and error of a given matrix
-     * @param a matrix to LU factorize
+     * @param a matrix to LU factorize, the matrix must be symmetric
      * @return a Result object where the first Matrix (a) is L
      * and the second (b) is U
      */
     public static Result lu_fact(Matrix a) {
+        // starts as identity matrix (done below)
         double[][] l = new double[a.getRows()][a.getRows()];
         double[][] u = new double[a.getRows()][a.getCols()];
 
-        // Copy first row of matrix a to u
-        for (int col = 0; col < a.getCols(); col++) {
-            u[0][col] = a.get(0, col);
-            double pivot = u[0][0];
-            for (int row = 0; row < a.getRows(); row++) {
-                l[row][0] = a.get(row, 0) / pivot;
+        // Copy matrix a to u
+        for (int row = 0; row < a.getRows(); row++) {
+            for (int col = 0; col < a.getCols(); col++) {
+                u[row][col] = a.get(row, col);
             }
         }
         // Goes through all the rows (i is the current-pivot-row)
         for (int i = 0; i < a.getRows(); i++) {
-            double pivot = a.get(i, i); // TODO fix later if pivot = 0
-            l[i][i] = 1;
-            double[] pRow = a.getRow(i);
+            double pivot = u[i][i]; // TODO fix later if pivot = 0
+            l[i][i] = 1; // makes L into an identity matrix
+            double[] pRow = u[i];
             // Goes through all the rows underneath the "i'th" row
             for (int j = i + 1; j < a.getRows(); j++) {
-                // Copy things and construct l
-                l[j][i] = a.get(j, i) / pivot;
                 // Row reduce for u
-                double[] nextRow = a.getRow(j);
+                double[] nextRow = u[j];
                 double ratio = nextRow[i] / pivot;
+                // Copy things and construct l
+                l[j][i] = ratio;
+//                System.out.println(nextRow[i] + " / " + pivot + " = " + l[j][i]);
                 // Row reduction (k - column)
                 for (int k = i; k < nextRow.length; k++) {
                     u[j][k] = nextRow[k] - pRow[k] * ratio;
                 }
             }
+//            System.out.println("\n Now on row: " + i + "\n" + new Matrix(u));
         }
 
-        // TODO find error
         Matrix L = new Matrix(l);
         Matrix U = new Matrix(u);
         Matrix LxU = LinearAlgebra.matrixMultiply(L, U);
         Matrix err = LinearAlgebra.matrixSubtract(LxU, a);
-        // now find the norm of the err matrix
-        // aka max eigenvalue of SYMMETRIC matrix
-        double error = 0;
-        // TODO USE WILLIAM'S POWER METHOD METHOD (max eigenvalue)
-        return new Result(L, U, error);
+        return new Result(L, U, norm(err));
     }
 
     /**
      * Finds the QR factorization and error of a given matrix
      * with the Householders method.
-     * @param m matrix to QR factorize
+     * @param a matrix to QR factorize
      * @return a Result object where the first Matrix (a) is Q
      * and the second (B) is R
      */
-    public static Result qr_fact_househ(Matrix m) {
+    public static Result qr_fact_househ(Matrix a) {
+
         return null;
     }
 
     /**
      * Finds the QR factorization and error of a given matrix
      * with the Givens Rotation method.
-     * @param m matrix to QR factorize
+     * @param a matrix to QR factorize
      * @return a Result object where the first Matrix (a) is Q
      * and the second (B) is R
      */
-    public static Result qr_fact_givens(Matrix m) {
+    public static Result qr_fact_givens(Matrix a) {
+
         return null;
     }
 
-    public static Vector solve_lu_b(Matrix m, Vector v) {
+    /**
+     * Solve for x in Ax = b with LU factorization
+     *
+     * @param a matrix to be LU factorized
+     * @param b vector to multiply
+     * @return the resultant vector
+     */
+    public static Vector solve_lu_b(Matrix a, Vector b) {
+        Result lu = lu_fact(a);
+        Matrix lInv = inverseDown(lu.getA());
+        Matrix uInv = inverseUp(lu.getB());
+        // Ax = b
+        // A = LU
+        // LUx = b
+        // x = (Uinv)(Linv)b
+        return LinearAlgebra.matrixVectorMultiply(uInv, LinearAlgebra.matrixVectorMultiply(lInv, b));
+    }
+
+    /**
+     * Solve for x in Ax = b with QR factorization
+     *
+     * @param a matrix to be QR factorized and multiplied with the vector
+     * @param v vector to multiply
+     * @return the resultant vector
+     */
+    public static Vector solve_qr_b(Matrix a, Vector v) {
+        Result qr = qr_fact_househ(a);
+        Matrix q = qr.getA();
+        Matrix r = qr.getB();
+
         return null;
     }
 
-    public static Vector solve_qr_b(Matrix m, Vector v) {
-        return null;
+    /**
+     * Finds the norm of the given matrix (max value)
+     * @param mat matrix to find the norm of
+     * @return the maximum value (absolute)
+     */
+    public static double norm(AbstractMatrix mat) {
+        double norm = mat.get(0, 0);
+        for (int i = 0; i < mat.getRows(); i++) {
+            for (int j = 0; j < mat.getCols(); j++) {
+                double curr = Math.abs(mat.get(i, j));
+                if (curr > norm) {
+                    norm = curr;
+                }
+            }
+        }
+        return norm;
+    }
+
+    /**
+     * Finds the inverse of a matrix with forwards substitution
+     * @param mat given matrix
+     * @return inverse of the given matrix
+     */
+    public static Matrix inverseDown(AbstractMatrix mat) {
+        if (mat.getRows() != mat.getCols()) {
+            System.out.println("Matrix must be square to be invertible");
+            return null;
+        }
+        double[][] inverse = new double[mat.getRows()][mat.getRows()];
+        double[][] original = new double[mat.getRows()][mat.getRows()];
+
+        // Copy matrix mat to original
+        for (int row = 0; row < mat.getRows(); row++) {
+            inverse[row][row] = 1; // makes L into an identity matrix
+            for (int col = 0; col < mat.getCols(); col++) {
+                original[row][col] = mat.get(row, col);
+            }
+        }
+        // Goes through all the rows (i is the current-pivot-row)
+        for (int i = 0; i < original.length; i++) {
+//            System.out.println("Original:\n" + new Matrix(original) + "\nInverse:\n" + new Matrix(inverse));
+            double pivot = original[i][i]; // TODO fix later if pivot = 0
+            // Goes through all the rows underneath the "i'th" row (j - row)
+            for (int j = i + 1; j < original.length; j++) {
+                // Row reduce for original and copy operations to inverse
+                double ratio = original[j][i] / pivot;
+                // Row reduction (k - column)
+                for (int k = 0; k < original[i].length; k++) {
+                    original[j][k] -= original[i][k] * ratio;
+                    inverse[j][k] -= inverse[i][k] * ratio;
+                }
+            }
+            // Row reduce so inverse pivots are 1 (j - column)
+            for (int j = i; j < inverse[i].length; j++) {
+                inverse[i][j] /= pivot;
+            }
+        }
+
+        return new Matrix(inverse);
+    }
+
+    /**
+     * Finds the inverse of a matrix with backwards substitution
+     * @param mat given matrix
+     * @return inverse of the given matrix
+     */
+    public static Matrix inverseUp(AbstractMatrix mat) {
+        if (mat.getRows() != mat.getCols()) {
+            System.out.println("Matrix must be square to be invertible");
+            return null;
+        }
+        double[][] inverse = new double[mat.getRows()][mat.getRows()];
+        double[][] original = new double[mat.getRows()][mat.getRows()];
+
+        // Copy matrix mat to original
+        for (int row = 0; row < mat.getRows(); row++) {
+            inverse[row][row] = 1; // makes L into an identity matrix
+            for (int col = 0; col < mat.getCols(); col++) {
+                original[row][col] = mat.get(row, col);
+            }
+        }
+        // Goes through all the rows (i is the current-pivot-row)
+        for (int i = original.length - 1; i > 0; i--) {
+//            System.out.println("Original:\n" + new Matrix(original) + "\nInverse:\n" + new Matrix(inverse));
+            double pivot = original[i][i]; // TODO fix later if pivot = 0
+            // Goes through all the rows underneath the "i'th" row
+            for (int j = i - 1; j >= 0; j--) {
+                // Row reduce for original and copy operations to inverse
+                double ratio = original[j][i] / pivot;
+                // Row reduction (k - column)
+                for (int k = 0; k < original[i].length; k++) {
+                    original[j][k] -= original[i][k] * ratio;
+                    inverse[j][k] -= inverse[i][k] * ratio;
+                }
+            }
+            // Row reduce so inverse pivots are 1 (j - column)
+            for (int j = i; j < inverse[i].length; j++) {
+                inverse[i][j] /= pivot;
+            }
+        }
+
+        return new Matrix(inverse);
     }
 
     public String toString() {
         return mat.toString();
-    }
-
-    public static void main(String[] args) {
-        Hilbert a = new Hilbert(3);
-        Result r = lu_fact(a.getMat());
-        System.out.println(r.getA());
-        System.out.println(r.getB());
-        System.out.println(LinearAlgebra.matrixMultiply(r.getA(), r.getB()));
     }
 
 }
