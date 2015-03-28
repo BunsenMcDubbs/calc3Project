@@ -2,7 +2,7 @@
  * Immutable abstraction for Vector
  *
  * @author Andrew Dai
- * @version 1.3
+ * @version 1.4
  */
 package utils;
 
@@ -59,4 +59,34 @@ public class Vector {
         }
         return s;
     }
+    
+    /**
+     * Calculates the magnitude of the vector.
+     * Added by William Greenleaf.
+     * @return double vector's magnitude
+     */
+     public double getMagnitude() {
+         double sum = 0;
+         for (double i : vector) {
+             sum = sum + java.lang.Math.pow(i, 2.0);
+         }
+         return java.lang.Math.sqrt(sum);
+    }
+    
+    /**
+     * Returns a normalized version of the vector.
+     * Added by William Greenleaf. 
+     * @return Vector normalized copy of the vector
+     */
+     public Vector normalizeVector() {
+         double[] newVec = new double[vector.length];
+         for (int i = 0; i < vector.length; i++) {
+             newVec[i] = vector[i];
+         }
+         double magVec = this.getMagnitude();
+         for (int i = 0; i < newVec.length; i++) {
+             newVec[i] = newVec[i]/magVec;
+         }
+         return new Vector(newVec);
+     }
 }
