@@ -18,14 +18,14 @@ public class LinearAlgebra {
      * @return resulting vector
      * @throws IllegalOperandException when dimensions don't match
      */
-    public static Vector matrixVectorMultiply(Matrix m, Vector v) throws
-        IllegalOperandException {
+    public static Vector matrixVectorMultiply(AbstractMatrix m, Vector v) {
 
         if (m.getWidth() != v.getLength()) {
             String s = "Cannot multiply together matrix and vector with "
                 + "mismatching dimensions.\nMatrix width (" + m.getWidth()
                 + ") must " + "equal vector length (" + v.getLength() + ")";
-            throw new IllegalOperandException(s);
+            System.out.println(s);
+            return null;
         }
 
         double[] prod = new double[m.getHeight()];
@@ -49,16 +49,7 @@ public class LinearAlgebra {
      * @return the matrix sum
      * @throws IllegalOperandException when dimensions don't match
      */
-    public static Matrix matrixAdd(Matrix m1, Matrix m2) throws
-        IllegalOperandException {
-
-        if (m1.getHeight() != m2.getHeight() || m1.getWidth() != m2.getWidth())
-        {
-            String s = "Cannot add together two matrices of different "
-                + "dimensions. (" + m1.getHeight() + "x" + m1.getWidth()
-                + " and " + m2.getHeight() + "x" + m2.getWidth() + ")";
-            throw new IllegalOperandException(s);
-        }
+    public static Matrix matrixAdd(Matrix m1, Matrix m2) {
 
         double[][] sum = new double[m1.getHeight()][m1.getWidth()];
         for (int i = 0; i < m1.getHeight(); i++) {
@@ -67,6 +58,51 @@ public class LinearAlgebra {
             }
         }
         return new Matrix(sum);
+    }
+
+    /**
+     * Adds two matrices together and returns the resulting matrix.
+     *
+     * @param m1 - first matrix
+     * @param m2 - second matrix
+     * @return the matrix sum
+     * @throws IllegalOperandException when dimensions don't match
+     */
+    public static Matrix matrixSubtract(AbstractMatrix m1, AbstractMatrix m2) {
+
+        double[][] diff = new double[m1.getHeight()][m1.getWidth()];
+        for (int i = 0; i < m1.getHeight(); i++) {
+            for (int j = 0; j < m1.getWidth(); j++) {
+                diff[i][j] = m1.get(i, j) - m2.get(i, j);
+            }
+        }
+        return new Matrix(diff);
+    }
+
+    public static Matrix matrixMultiply(AbstractMatrix a, AbstractMatrix b) {
+        double[][] r = new double[a.getRows()][b.getCols()];
+        for (int i = 0; i < r.length; i++) {
+            for (int j = 0; j < r[0].length; j++) {
+                for (int k = 0; k < a.getCols(); k++) {
+                    r[i][j] += a.get(i, k) * b.get(k, j);
+                }
+            }
+        }
+        return new Matrix(r);
+    }
+
+    public static Matrix matrixMultiply(ElementaryMatrix a, AbstractMatrix b) {
+        double[][] r = new double[a.getRows()][b.getCols()];
+        for (int i = 0; i < r.length; i++) {
+            for (int j = 0; j < r[0].length; j++) {
+                if (i == a.getTo()) {
+                    r[i][j] = a.calc(b.get(a.getFrom(), j), r[i][j]);
+                } else {
+                    r[i][j] = b.get(i, j);
+                }
+            }
+        }
+        return new Matrix(r);
     }
 
     /**

@@ -14,4 +14,7 @@ public class Result {
         this.error = error;
     }
 
+    public Matrix getA() { return a; }
+    public Matrix getB() { return b; }
+    public double getError() { return error; }
 }
