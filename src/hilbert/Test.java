@@ -1,13 +1,12 @@
 package hilbert;
 
-import javafx.scene.shape.HLineTo;
 import utils.LinearAlgebra;
 import utils.Matrix;
 import utils.Result;
 import utils.Vector;
 
 /**
- * Created by andrew on 3/28/15.
+ * This is a testing class
  */
 public class Test {
 
