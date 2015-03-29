@@ -1,5 +1,7 @@
 package hilbert;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import utils.*;
 
 /**
@@ -81,6 +83,39 @@ public class Hilbert {
      * and the second (B) is R
      */
     public static Result qr_fact_househ(Matrix a) {
+        Deque<Matrix> qParts = new ArrayDeque<Matrix>();
+        double[][] r = new double[a.getRows()][a.getCols()];
+        for (int i = 0; i < r.length; i++) {
+            for (int j = 0; j < r[0].length; j++) {
+                r[i][j] = a.get(i, j);
+            }
+        }
+        // Iterating though the "sub matrices"
+        // a(i, i) is the top left corner of the sub matrix
+        for (int i = 0; i < r.length - 1; i++) {
+            // first column in the sub matrix
+            double[] ai = new double[r.length - i];
+            // determining the length of ai
+            double length = 0;
+            // iterating down the rows and constructing col vector
+            for (int j = i; j < r.length; j++) {
+                ai[j - i] = r[j][i];
+                length += ai[j - i] * ai[j - 1];
+            }
+            length = Math.sqrt(length);
+            ai[0] += length;
+            Vector u = new Vector(ai).normalizeVector();
+            IdentityMatrix id = new IdentityMatrix(r.length - i);
+            // (u)(uTrans)
+            double[][] uut = new double[u.getLength()][u.getLength()];
+            for (int row = 0; row < uut.length; row++) {
+                for (int col = 0; col < uut.length; col++) {
+                    uut[row][col] = 2 * u.get(row) * u.get(col);
+                }
+            }
+            Matrix hi = LinearAlgebra.matrixSubtract(id, new Matrix(uut));
+
+        }
 
         return null;
     }
