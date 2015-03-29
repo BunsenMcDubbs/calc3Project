@@ -22,13 +22,12 @@ public class Test {
         System.out.println("A\n" + mat);
         Result r = Hilbert.qr_fact_househ(mat);
         System.out.println("Q\n" + r.getA());
-        System.out.println();
         System.out.println("R\n" + r.getB());
 
         System.out.println("Q x R = A?");
         System.out.println(LinearAlgebra.matrixMultiply(r.getA(), r.getB()));
 
-        System.out.println("Solve for b (Ax = b)");
+        System.out.println("Solve for x (Ax = b)");
         Vector b = new Vector(new double[] {0.0464159, 0.0464159, 0.0464159, 0.0464159});
 
         System.out.println("solved x = " + Hilbert.solve_qr_b(mat, b));
@@ -44,7 +43,7 @@ public class Test {
         System.out.println();
         System.out.println("U\n" + r.getB());
 
-        System.out.println("Solve for b (Ax = b)");
+        System.out.println("Solve for x (Ax = b)");
         Vector b = new Vector(new double[] {0.0464159, 0.0464159, 0.0464159, 0.0464159});
 
         System.out.println("solved x = " + Hilbert.solve_lu_b(mat, b));

@@ -59,13 +59,11 @@ public class Hilbert {
                 double ratio = nextRow[i] / pivot;
                 // Copy things and construct l
                 l[j][i] = ratio;
-//                System.out.println(nextRow[i] + " / " + pivot + " = " + l[j][i]);
                 // Row reduction (k - column)
                 for (int k = i; k < nextRow.length; k++) {
                     u[j][k] = nextRow[k] - pRow[k] * ratio;
                 }
             }
-//            System.out.println("\n Now on row: " + i + "\n" + new Matrix(u));
         }
 
         Matrix L = new Matrix(l);
@@ -83,8 +81,8 @@ public class Hilbert {
      * and the second (B) is R
      */
     public static Result qr_fact_househ(Matrix a) {
-        Deque<Matrix> qParts = new ArrayDeque<Matrix>();
         Matrix r = new Matrix(a.cloneRaw());
+        Matrix q = new IdentityMatrix(a.getRows()).getMat();
         // Iterating though the "sub matrices"
         // a(i, i) is the top left corner of the sub matrix
         for (int i = 0; i < r.getRows() - 1; i++) {
@@ -125,15 +123,12 @@ public class Hilbert {
                 }
             }
             Matrix hiBig = new Matrix(hiBigTemp);
-            qParts.push(hiBig);
+            q = LinearAlgebra.matrixMultiply(q, transpose(hiBig));
             r = LinearAlgebra.matrixMultiply(hiBig, r);
         }
-
-        Matrix q = qParts.pop();
-        while (!qParts.isEmpty()) {
-            q = LinearAlgebra.matrixMultiply(qParts.pop(), q);
-        }
-        double error = norm(LinearAlgebra.matrixSubtract(LinearAlgebra.matrixMultiply(q, r), a));
+        double error = norm(
+                LinearAlgebra.matrixSubtract(
+                        LinearAlgebra.matrixMultiply(q, r), a));
 
         return new Result(q, r, error);
     }
@@ -165,11 +160,14 @@ public class Hilbert {
         // A = LU
         // LUx = b
         // x = (Uinv)(Linv)b
-        return LinearAlgebra.matrixVectorMultiply(uInv, LinearAlgebra.matrixVectorMultiply(lInv, b));
+        return LinearAlgebra.matrixVectorMultiply(uInv,
+                LinearAlgebra.matrixVectorMultiply(lInv, b));
     }
 
     /**
      * Solve for x in Ax = b with QR factorization
+     * This method currently uses Householder's method to
+     * perform QR factorization
      *
      * @param a matrix to be QR factorized and multiplied with the vector
      * @param b
@@ -181,13 +179,11 @@ public class Hilbert {
         Matrix r = qr.getB();
         Matrix qT = transpose(q);
         Matrix rInv = inverseUp(r);
-        System.out.println("rInv\n" + rInv);
-        System.out.println("qT\n" + qT);
-        System.out.println("b\n" + b);
-        System.out.println("qT * b\n" + LinearAlgebra.matrixVectorMultiply(qT, b));
-        System.out.println("r * rInv\n" + LinearAlgebra.matrixMultiply(r, rInv));
-        System.out.println("q * qT\n" + LinearAlgebra.matrixMultiply(q, qT));
-        return LinearAlgebra.matrixVectorMultiply(rInv, LinearAlgebra.matrixVectorMultiply(qT, b));
+        // Ax = b
+        // ==> QRx = b
+        // ==> x = (rInv) ((qT) (b))
+        return LinearAlgebra.matrixVectorMultiply(rInv,
+                LinearAlgebra.matrixVectorMultiply(qT, b));
     }
 
     /**
