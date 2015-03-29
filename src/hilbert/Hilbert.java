@@ -136,13 +136,49 @@ public class Hilbert {
     /**
      * Finds the QR factorization and error of a given matrix
      * with the Givens Rotation method.
+     * This method performs best/assumes a square matrix
      * @param a matrix to QR factorize
      * @return a Result object where the first Matrix (a) is Q
      * and the second (B) is R
      */
     public static Result qr_fact_givens(Matrix a) {
+        Matrix q = new IdentityMatrix(a.getRows()).getMat();
+        Matrix r = a.getMat();
 
-        return null;
+        // Traverse down the lower triangle to rotate and zero-out
+        // elements to obtain R
+        // Q will equal G(1)t * G(2)t * ... etc
+        for (int row = 1; row < r.getRows(); row++) {
+            for (int col = 0; col < row; col++) {
+//                System.out.println("Eliminating element at: " + row + " " + col);
+                double x = r.get(col, col);
+                double y = r.get(row, col);
+                // using Math.hypot to obtain sqrt(x^2 + y^2) more accurately
+                // see http://en.wikipedia.org/wiki/Hypot
+                double hypot = Math.hypot(x, y);
+                // calculating cos(theta)
+                double c = x / hypot;
+                // calculating sin(theta)
+                double s = -y / hypot;
+//                System.out.println("cos = " + c + " sin = " + s);
+                // Construct the G(i) matrix
+                double[][] gi = new IdentityMatrix(a.getRows()).cloneRaw();
+                gi[col][col] = c;
+                gi[col][row] = -s;
+                gi[row][col] = s;
+                gi[row][row] = c;
+                // R = ... * G(3) * G(2) * G(1) * A
+                r = LinearAlgebra.matrixMultiply(new Matrix(gi), r);
+                // Q = G(1)t * G(2)t * ...
+                q = LinearAlgebra.matrixMultiply(q, transpose(new Matrix(gi)));
+//                System.out.println("G(i)\n" + new Matrix(gi));
+//                System.out.println("A(i)\n" + r);
+            }
+        }
+
+        Matrix qxr = LinearAlgebra.matrixMultiply(q, r);
+        double error = norm(LinearAlgebra.matrixSubtract(qxr, a));
+        return new Result(q, r, error);
     }
 
     /**
@@ -187,12 +223,34 @@ public class Hilbert {
     }
 
     /**
+     * Solve for x in Ax = b with QR factorization
+     * This method currently uses Householder's method to
+     * perform QR factorization
+     *
+     * @param a matrix to be QR factorized and multiplied with the vector
+     * @param b
+     * @return the resultant vector
+     */
+    public static Vector solve_qr_b_givens(Matrix a, Vector b) {
+        Result qr = qr_fact_givens(a);
+        Matrix q = qr.getA();
+        Matrix r = qr.getB();
+        Matrix qT = transpose(q);
+        Matrix rInv = inverseUp(r);
+        // Ax = b
+        // ==> QRx = b
+        // ==> x = (rInv) ((qT) (b))
+        return LinearAlgebra.matrixVectorMultiply(rInv,
+                LinearAlgebra.matrixVectorMultiply(qT, b));
+    }
+
+    /**
      * Finds the norm of the given matrix (max value)
      * @param mat matrix to find the norm of
      * @return the maximum value (absolute)
      */
     public static double norm(AbstractMatrix mat) {
-        double norm = mat.get(0, 0);
+        double norm = Math.abs(mat.get(0, 0));
         for (int i = 0; i < mat.getRows(); i++) {
             for (int j = 0; j < mat.getCols(); j++) {
                 double curr = Math.abs(mat.get(i, j));
