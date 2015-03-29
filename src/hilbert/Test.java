@@ -1,13 +1,12 @@
 package hilbert;
 
-import javafx.scene.shape.HLineTo;
 import utils.LinearAlgebra;
 import utils.Matrix;
-import utils.Result;
+import utils.MatFact;
 import utils.Vector;
 
 /**
- * Created by andrew on 3/28/15.
+ * This is a testing class
  */
 public class Test {
 
@@ -15,17 +14,53 @@ public class Test {
         hilbertLUTest();
     }
 
-    public static void hilbertLUTest() {
-        Hilbert a = new Hilbert(4);
-        Matrix mat = a.getMat();
+    public static void hilbertQRGivensTest() {
+        System.out.println("Testing QR Givens Rotations");
+        Hilbert mat = new Hilbert(4);
 
         System.out.println("A\n" + mat);
-        Result r = Hilbert.lu_fact(mat);
+        MatFact r = Hilbert.qr_fact_givens(mat);
+        System.out.println("Q\n" + r.getA());
+        System.out.println("R\n" + r.getB());
+
+        System.out.println("Q x R = A?");
+        System.out.println(LinearAlgebra.matrixMultiply(r.getA(), r.getB()));
+
+        System.out.println("Solve for x (Ax = b)");
+        Vector b = new Vector(new double[] {0.0464159, 0.0464159, 0.0464159, 0.0464159});
+
+        System.out.println("solved x = " + Hilbert.solve_qr_b_givens(mat, b));
+    }
+
+    public static void hilbertQRHouseTest() {
+        System.out.println("Testing QR Householders Reflections");
+        Hilbert mat = new Hilbert(4);
+
+        System.out.println("A\n" + mat);
+        MatFact r = Hilbert.qr_fact_househ(mat);
+        System.out.println("Q\n" + r.getA());
+        System.out.println("R\n" + r.getB());
+
+        System.out.println("Q x R = A?");
+        System.out.println(LinearAlgebra.matrixMultiply(r.getA(), r.getB()));
+
+        System.out.println("Solve for x (Ax = b)");
+        Vector b = new Vector(new double[] {0.0464159, 0.0464159, 0.0464159, 0.0464159});
+
+        System.out.println("solved x = " + Hilbert.solve_qr_b(mat, b));
+    }
+
+    public static void hilbertLUTest() {
+        System.out.println("Testing LU Factorization");
+        Hilbert mat = new Hilbert(4);
+
+        System.out.println("A\n" + mat);
+        MatFact r = Hilbert.lu_fact(mat);
         System.out.println("L\n" + r.getA());
         System.out.println();
         System.out.println("U\n" + r.getB());
 
-        System.out.println("Solve for b (Ax = b)");
+        System.out.println("Solve for x (Ax = b)");
         Vector b = new Vector(new double[] {0.0464159, 0.0464159, 0.0464159, 0.0464159});
 
         System.out.println("solved x = " + Hilbert.solve_lu_b(mat, b));
@@ -40,7 +75,7 @@ public class Test {
         Matrix mat = new Matrix(testMat);
 
         System.out.println("A\n" + mat);
-        Result r = Hilbert.lu_fact(mat);
+        MatFact r = Hilbert.lu_fact(mat);
         System.out.println("L\n" + r.getA());
         System.out.println();
         System.out.println("U\n" + r.getB());

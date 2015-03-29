@@ -36,12 +36,15 @@ public final class Matrix extends AbstractMatrix{
         }
     }
 
-    public double[] getCol(int i) {
-        // TODO
-        return null;
+    public Vector getCol(int j) {
+        double[] col = new double[matrix.length];
+        for (int i = 0; i < matrix.length; i++) {
+            col[i] = matrix[i][j];
+        }
+        return new Vector(col);
     }
 
-    public double[] getRow(int i) {
-        return matrix[i];
+    public Vector getRow(int i) {
+        return new Vector(matrix[i]);
     }
 }

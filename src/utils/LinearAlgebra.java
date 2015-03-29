@@ -134,22 +134,29 @@ public class LinearAlgebra {
      * @param v1 - first vector
      * @param v2 - second vector
      * @return the resulting vector sum
-     * @throws IllegalOperandException when dimensions don't match
      */
-    public static Vector vectorAdd(Vector v1, Vector v2) throws
-        IllegalOperandException {
-
-        if (v1.getLength() != v2.getLength()) {
-            String s = "Cannot add together two vectors of different lengths.\n"
-                + "(" + v1.getLength() + " and " + v2.getLength() + ")";
-            throw new IllegalOperandException(s);
-        }
+    public static Vector vectorAdd(Vector v1, Vector v2) {
 
         double[] sum = new double[v1.getLength()];
         for (int i = 0; i < sum.length; i++) {
             sum[i] = v1.get(i) + v2.get(i);
         }
         return new Vector(sum);
+    }
+
+    /**
+     * Subtracts two vectors and returns the difference.
+     * @param v1 - first vector
+     * @param v2 - second vector
+     * @return the resulting vector diff
+     */
+    public static Vector vectorSubtract(Vector v1, Vector v2) {
+
+        double[] diff = new double[v1.getLength()];
+        for (int i = 0; i < diff.length; i++) {
+            diff[i] = v1.get(i) - v2.get(i);
+        }
+        return new Vector(diff);
     }
 
 }
