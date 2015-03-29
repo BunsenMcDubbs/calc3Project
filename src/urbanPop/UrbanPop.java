@@ -13,7 +13,9 @@ public class UrbanPop {
      * @param approx Approximate eigen vector
      * @return Power Result object with the eigen vector, eigen value, and iteration
      */
-    public static PowerResult power_method(Matrix a, double tol, Vector approx) {
+    public static PowerResult power_method(Matrix a, double tol, Vector approx)
+        throws PowerDoesNotConvergeException {
+
         int i = 0;
         Vector newApprox = LinearAlgebra.matrixVectorMultiply(a, approx);
         double eiValue1;
@@ -21,6 +23,7 @@ public class UrbanPop {
         double testEi1;
         double testEi2;
         Vector eiVector;
+        int maxIterations = 100000;
         do {
             i++;
             eiValue1 = newApprox.getMax();
@@ -30,7 +33,10 @@ public class UrbanPop {
             eiVector = newApprox.divideComponents(eiValue2);
             testEi2 = eiValue2;
             testEi1 = eiValue1;
-        } while ((Math.abs(testEi1) - Math.abs(testEi2)) > tol);
+        } while (Math.abs((Math.abs(testEi1) - Math.abs(testEi2))) > tol && i < maxIterations);
+        if (i == maxIterations){
+            throw new PowerDoesNotConvergeException("The eigen value did not converge.");
+        }
         return new PowerResult(eiVector, eiValue2, i);
     }
 }

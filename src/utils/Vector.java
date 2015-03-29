@@ -107,8 +107,8 @@ public class Vector {
     }
     
     /**
-     * Returns absolute minimum of vector.
-     * @return absolute minimum of vector
+     * Returns maximum element of vector.
+     * @return maximum element of vector
      */
     public double getMax() {
         double max = vector[0];
@@ -120,6 +120,10 @@ public class Vector {
         return max;
     }
     
+    /**
+     * Divides all elemnts of vector by a scalar
+     * @return vector divided by scalar
+     */
     public Vector divideComponents(double quotient) {
         double[] newVec = new double[vector.length];
         for (int i = 0; i < vector.length; i++) {
@@ -131,6 +135,10 @@ public class Vector {
         return new Vector(newVec);
     }
     
+    /**
+     * Creates a copy of a vector.
+     * @return copied vector
+     */
     public Vector deepCopy() {
         double[] newVec = new double[vector.length];
         for (int i = 0; i < vector.length; i++) {
