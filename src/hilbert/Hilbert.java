@@ -2,31 +2,44 @@ package hilbert;
 
 import utils.*;
 
+import java.util.HashMap;
+
 /**
  * Created by andrew on 3/23/15.
  */
-public class Hilbert {
+public class Hilbert extends AbstractMatrix{
 
-    private Matrix mat;
+    double[][] mat;
+    static HashMap<Integer, Double> cheat = new HashMap<Integer, Double>();
 
     /**
      * Constructs an n by n Hilbert matrix
      * @param n number of row/col for the square matrix
      */
     public Hilbert (int n) {
-        double[][] mat = new double[n][n];
+        super(n, n);
+        mat = new double[n][n];
 
         for (int i = 0; i < n; i++) {
             for (int j = 0; j <= i; j++) {
-                mat[i][j] = 1. / (i + j + 1);
-                mat[j][i] = mat[i][j];
+                double elem;
+                int denom = i + j + 1;
+                if (cheat.containsKey(denom)) {
+                    elem = cheat.get(denom);
+                } else {
+                    elem = 1. / denom;
+                    cheat.put(denom, elem);
+                }
+                mat[i][j] = elem;
+                mat[j][i] = elem;
             }
         }
-
-        this.mat = new Matrix(mat);
     }
 
-    public Matrix getMat() { return mat; }
+    @Override
+    public double get(int i, int j) {
+        return mat[i][j];
+    }
 
     /**
      * Finds the LU factorization and error of a given matrix
@@ -34,7 +47,7 @@ public class Hilbert {
      * @return a Result object where the first Matrix (a) is L
      * and the second (b) is U
      */
-    public static Result lu_fact(Matrix a) {
+    public static MatFact lu_fact(AbstractMatrix a) {
         // starts as identity matrix (done below)
         double[][] l = new double[a.getRows()][a.getRows()];
         double[][] u = new double[a.getRows()][a.getCols()];
@@ -68,7 +81,7 @@ public class Hilbert {
         Matrix U = new Matrix(u);
         Matrix LxU = LinearAlgebra.matrixMultiply(L, U);
         Matrix err = LinearAlgebra.matrixSubtract(LxU, a);
-        return new Result(L, U, norm(err));
+        return new MatFact(L, U, norm(err));
     }
 
     /**
@@ -78,7 +91,7 @@ public class Hilbert {
      * @return a Result object where the first Matrix (a) is Q
      * and the second (B) is R
      */
-    public static Result qr_fact_househ(Matrix a) {
+    public static MatFact qr_fact_househ(AbstractMatrix a) {
         Matrix r = new Matrix(a.cloneRaw());
         Matrix q = new IdentityMatrix(a.getRows()).getMat();
         // Iterating though the "sub matrices"
@@ -128,7 +141,7 @@ public class Hilbert {
                 LinearAlgebra.matrixSubtract(
                         LinearAlgebra.matrixMultiply(q, r), a));
 
-        return new Result(q, r, error);
+        return new MatFact(q, r, error);
     }
 
     /**
@@ -139,7 +152,7 @@ public class Hilbert {
      * @return a Result object where the first Matrix (a) is Q
      * and the second (B) is R
      */
-    public static Result qr_fact_givens(Matrix a) {
+    public static MatFact qr_fact_givens(AbstractMatrix a) {
         Matrix q = new IdentityMatrix(a.getRows()).getMat();
         Matrix r = a.getMat();
 
@@ -176,7 +189,7 @@ public class Hilbert {
 
         Matrix qxr = LinearAlgebra.matrixMultiply(q, r);
         double error = norm(LinearAlgebra.matrixSubtract(qxr, a));
-        return new Result(q, r, error);
+        return new MatFact(q, r, error);
     }
 
     /**
@@ -184,31 +197,32 @@ public class Hilbert {
      *
      * @param a matrix to be LU factorized
      * @param b
-     * @return the resultant vector
+     * @return the resultant vector and error in LU factorization
      */
-    public static Vector solve_lu_b(Matrix a, Vector b) {
-        Result lu = lu_fact(a);
+    public static VectorAndError solve_lu_b(AbstractMatrix a, Vector b) {
+        MatFact lu = lu_fact(a);
         Matrix lInv = inverseDown(lu.getA());
         Matrix uInv = inverseUp(lu.getB());
         // Ax = b
         // A = LU
         // LUx = b
         // x = (Uinv)(Linv)b
-        return LinearAlgebra.matrixVectorMultiply(uInv,
+        Vector x = LinearAlgebra.matrixVectorMultiply(uInv,
                 LinearAlgebra.matrixVectorMultiply(lInv, b));
+        return new VectorAndError(x, lu.getError());
     }
 
     /**
      * Solve for x in Ax = b with QR factorization
-     * This method currently uses Householder's method to
+     * This method currently uses Householder's reflections to
      * perform QR factorization
      *
-     * @param a matrix to be QR factorized and multiplied with the vector
+     * @param a matrix will be QR factorized via Householders
      * @param b
-     * @return the resultant vector
+     * @return the resultant vector and error in QR factorization
      */
-    public static Vector solve_qr_b(Matrix a, Vector b) {
-        Result qr = qr_fact_househ(a);
+    public static VectorAndError solve_qr_b(AbstractMatrix a, Vector b) {
+        MatFact qr = qr_fact_househ(a);
         Matrix q = qr.getA();
         Matrix r = qr.getB();
         Matrix qT = transpose(q);
@@ -216,21 +230,22 @@ public class Hilbert {
         // Ax = b
         // ==> QRx = b
         // ==> x = (rInv) ((qT) (b))
-        return LinearAlgebra.matrixVectorMultiply(rInv,
+        Vector x = LinearAlgebra.matrixVectorMultiply(rInv,
                 LinearAlgebra.matrixVectorMultiply(qT, b));
+        return new VectorAndError(x, qr.getError());
     }
 
     /**
      * Solve for x in Ax = b with QR factorization
-     * This method currently uses Householder's method to
+     * This method currently uses Givens Rotations to
      * perform QR factorization
      *
-     * @param a matrix to be QR factorized and multiplied with the vector
+     * @param a matrix will be QR factorized via Givens
      * @param b
-     * @return the resultant vector
+     * @return the resultant vector and error in QR factorization
      */
-    public static Vector solve_qr_b_givens(Matrix a, Vector b) {
-        Result qr = qr_fact_givens(a);
+    public static VectorAndError solve_qr_b_givens(AbstractMatrix a, Vector b) {
+        MatFact qr = qr_fact_givens(a);
         Matrix q = qr.getA();
         Matrix r = qr.getB();
         Matrix qT = transpose(q);
@@ -238,8 +253,9 @@ public class Hilbert {
         // Ax = b
         // ==> QRx = b
         // ==> x = (rInv) ((qT) (b))
-        return LinearAlgebra.matrixVectorMultiply(rInv,
+        Vector x = LinearAlgebra.matrixVectorMultiply(rInv,
                 LinearAlgebra.matrixVectorMultiply(qT, b));
+        return new VectorAndError(x, qr.getError());
     }
 
     /**
@@ -356,10 +372,6 @@ public class Hilbert {
             }
         }
         return new Matrix(trans);
-    }
-
-    public String toString() {
-        return mat.toString();
     }
 
 }

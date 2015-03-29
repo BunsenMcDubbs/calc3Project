@@ -3,12 +3,12 @@ package utils;
 /**
  * Created by andrew on 3/23/15.
  */
-public class Result {
+public class MatFact {
 
-    private Matrix a, b;
-    private double error;
+    private final Matrix a, b;
+    private final double error;
 
-    public Result(Matrix a, Matrix b, double error) {
+    public MatFact(Matrix a, Matrix b, double error) {
         this.a = a;
         this.b = b;
         this.error = error;

@@ -2,7 +2,7 @@ package hilbert;
 
 import utils.LinearAlgebra;
 import utils.Matrix;
-import utils.Result;
+import utils.MatFact;
 import utils.Vector;
 
 /**
@@ -11,16 +11,15 @@ import utils.Vector;
 public class Test {
 
     public static void main(String... args) {
-        hilbertQRGivensTest();
+        hilbertLUTest();
     }
 
     public static void hilbertQRGivensTest() {
         System.out.println("Testing QR Givens Rotations");
-        Hilbert a = new Hilbert(4);
-        Matrix mat = a.getMat();
+        Hilbert mat = new Hilbert(4);
 
         System.out.println("A\n" + mat);
-        Result r = Hilbert.qr_fact_givens(mat);
+        MatFact r = Hilbert.qr_fact_givens(mat);
         System.out.println("Q\n" + r.getA());
         System.out.println("R\n" + r.getB());
 
@@ -35,11 +34,10 @@ public class Test {
 
     public static void hilbertQRHouseTest() {
         System.out.println("Testing QR Householders Reflections");
-        Hilbert a = new Hilbert(4);
-        Matrix mat = a.getMat();
+        Hilbert mat = new Hilbert(4);
 
         System.out.println("A\n" + mat);
-        Result r = Hilbert.qr_fact_househ(mat);
+        MatFact r = Hilbert.qr_fact_househ(mat);
         System.out.println("Q\n" + r.getA());
         System.out.println("R\n" + r.getB());
 
@@ -54,11 +52,10 @@ public class Test {
 
     public static void hilbertLUTest() {
         System.out.println("Testing LU Factorization");
-        Hilbert a = new Hilbert(4);
-        Matrix mat = a.getMat();
+        Hilbert mat = new Hilbert(4);
 
         System.out.println("A\n" + mat);
-        Result r = Hilbert.lu_fact(mat);
+        MatFact r = Hilbert.lu_fact(mat);
         System.out.println("L\n" + r.getA());
         System.out.println();
         System.out.println("U\n" + r.getB());
@@ -78,7 +75,7 @@ public class Test {
         Matrix mat = new Matrix(testMat);
 
         System.out.println("A\n" + mat);
-        Result r = Hilbert.lu_fact(mat);
+        MatFact r = Hilbert.lu_fact(mat);
         System.out.println("L\n" + r.getA());
         System.out.println();
         System.out.println("U\n" + r.getB());
