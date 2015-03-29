@@ -13,6 +13,7 @@ public class IdentityMatrix extends AbstractMatrix {
     }
 
     public double get(int i, int j) {
+        // TODO check if i and j are < size
         return i == j ? 1 : 0;
     }
 

@@ -56,7 +56,7 @@ public abstract class AbstractMatrix {
         String s = "";
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                s += String.format("%02.3f\t", get(i, j));
+                s += String.format("%f\t", get(i, j));
             }
             s += "\n";
         }

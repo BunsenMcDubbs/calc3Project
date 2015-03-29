@@ -52,10 +52,10 @@ public class Vector {
     public String toString() {
         String s = "{ ";
         for (int i = 0; i < length - 1; i++) {
-            s += String.format("%02.3f\t", get(i));
+            s += String.format("%02.7f\t", get(i));
         }
         if (length > 0) {
-            s += String.format("%02.3f", get(length - 1));
+            s += String.format("%02.7f", get(length - 1));
         }
         return s + " }";
     }

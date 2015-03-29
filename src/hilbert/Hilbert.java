@@ -84,40 +84,58 @@ public class Hilbert {
      */
     public static Result qr_fact_househ(Matrix a) {
         Deque<Matrix> qParts = new ArrayDeque<Matrix>();
-        double[][] r = new double[a.getRows()][a.getCols()];
-        for (int i = 0; i < r.length; i++) {
-            for (int j = 0; j < r[0].length; j++) {
-                r[i][j] = a.get(i, j);
-            }
-        }
+        Matrix r = new Matrix(a.cloneRaw());
         // Iterating though the "sub matrices"
         // a(i, i) is the top left corner of the sub matrix
-        for (int i = 0; i < r.length - 1; i++) {
+        for (int i = 0; i < r.getRows() - 1; i++) {
+            // current length
+            int currLen =  r.getRows() - i;
             // first column in the sub matrix
-            double[] ai = new double[r.length - i];
+            double[] ai = new double[currLen];
             // determining the length of ai
             double length = 0;
-            // iterating down the rows and constructing col vector
-            for (int j = i; j < r.length; j++) {
-                ai[j - i] = r[j][i];
-                length += ai[j - i] * ai[j - 1];
+            // iterating down the rows to construct col vector
+            for (int j = i; j < r.getRows(); j++) {
+                ai[j - i] = r.get(j, i);
+                length += ai[j - i] * ai[j - i];
             }
             length = Math.sqrt(length);
-            ai[0] += length;
+            ai[0] += length; // adding e(i) * length to a(i)
             Vector u = new Vector(ai).normalizeVector();
-            IdentityMatrix id = new IdentityMatrix(r.length - i);
-            // (u)(uTrans)
+            IdentityMatrix id = new IdentityMatrix(currLen);
+            // (u)(uTrans) = matrix of n by n with n is the length of u
             double[][] uut = new double[u.getLength()][u.getLength()];
+            // calculating 2 * u * uTrans
             for (int row = 0; row < uut.length; row++) {
-                for (int col = 0; col < uut.length; col++) {
+                for (int col = row; col < uut.length; col++) {
+                    // takes of advantage of the fact that this
+                    // matrix is symmetrical
                     uut[row][col] = 2 * u.get(row) * u.get(col);
+                    uut[col][row] = uut[row][col];
                 }
             }
-            Matrix hi = LinearAlgebra.matrixSubtract(id, new Matrix(uut));
-
+            // "hiSmall" is the sub matrix of H(i) that needs to be
+            // reintegrated into the bigger H(i) matrix
+            Matrix hiSmall = LinearAlgebra.matrixSubtract(id, new Matrix(uut));
+            // copying back into a full sized H
+            double[][] hiBigTemp = new IdentityMatrix(r.getRows()).cloneRaw();
+            for (int row = 0; row < hiSmall.getWidth(); row++) {
+                for (int col = 0; col < hiSmall.getCols(); col++) {
+                    hiBigTemp[row + i][col + i] = hiSmall.get(row, col);
+                }
+            }
+            Matrix hiBig = new Matrix(hiBigTemp);
+            qParts.push(hiBig);
+            r = LinearAlgebra.matrixMultiply(hiBig, r);
         }
 
-        return null;
+        Matrix q = qParts.pop();
+        while (!qParts.isEmpty()) {
+            q = LinearAlgebra.matrixMultiply(qParts.pop(), q);
+        }
+        double error = norm(LinearAlgebra.matrixSubtract(LinearAlgebra.matrixMultiply(q, r), a));
+
+        return new Result(q, r, error);
     }
 
     /**
@@ -136,7 +154,7 @@ public class Hilbert {
      * Solve for x in Ax = b with LU factorization
      *
      * @param a matrix to be LU factorized
-     * @param b vector to multiply
+     * @param b
      * @return the resultant vector
      */
     public static Vector solve_lu_b(Matrix a, Vector b) {
@@ -154,15 +172,22 @@ public class Hilbert {
      * Solve for x in Ax = b with QR factorization
      *
      * @param a matrix to be QR factorized and multiplied with the vector
-     * @param v vector to multiply
+     * @param b
      * @return the resultant vector
      */
-    public static Vector solve_qr_b(Matrix a, Vector v) {
+    public static Vector solve_qr_b(Matrix a, Vector b) {
         Result qr = qr_fact_househ(a);
         Matrix q = qr.getA();
         Matrix r = qr.getB();
-
-        return null;
+        Matrix qT = transpose(q);
+        Matrix rInv = inverseUp(r);
+        System.out.println("rInv\n" + rInv);
+        System.out.println("qT\n" + qT);
+        System.out.println("b\n" + b);
+        System.out.println("qT * b\n" + LinearAlgebra.matrixVectorMultiply(qT, b));
+        System.out.println("r * rInv\n" + LinearAlgebra.matrixMultiply(r, rInv));
+        System.out.println("q * qT\n" + LinearAlgebra.matrixMultiply(q, qT));
+        return LinearAlgebra.matrixVectorMultiply(rInv, LinearAlgebra.matrixVectorMultiply(qT, b));
     }
 
     /**
@@ -185,7 +210,7 @@ public class Hilbert {
 
     /**
      * Finds the inverse of a matrix with forwards substitution
-     * @param mat given matrix
+     * @param mat given matrix (lower triangular)
      * @return inverse of the given matrix
      */
     public static Matrix inverseDown(AbstractMatrix mat) {
@@ -205,9 +230,10 @@ public class Hilbert {
         }
         // Goes through all the rows (i is the current-pivot-row)
         for (int i = 0; i < original.length; i++) {
-//            System.out.println("Original:\n" + new Matrix(original) + "\nInverse:\n" + new Matrix(inverse));
+//            System.out.println("Original:\n" + new Matrix(original) +
+//                  "\nInverse:\n" + new Matrix(inverse));
             double pivot = original[i][i]; // TODO fix later if pivot = 0
-            // Goes through all the rows underneath the "i'th" row (j - row)
+            // Goes through all the rows underneath the "i'th" row (j -> row)
             for (int j = i + 1; j < original.length; j++) {
                 // Row reduce for original and copy operations to inverse
                 double ratio = original[j][i] / pivot;
@@ -217,7 +243,7 @@ public class Hilbert {
                     inverse[j][k] -= inverse[i][k] * ratio;
                 }
             }
-            // Row reduce so inverse pivots are 1 (j - column)
+            // Row reduce so inverse pivots are 1 (j -> column)
             for (int j = i; j < inverse[i].length; j++) {
                 inverse[i][j] /= pivot;
             }
@@ -228,7 +254,7 @@ public class Hilbert {
 
     /**
      * Finds the inverse of a matrix with backwards substitution
-     * @param mat given matrix
+     * @param mat given matrix (upper triangular)
      * @return inverse of the given matrix
      */
     public static Matrix inverseUp(AbstractMatrix mat) {
@@ -247,26 +273,37 @@ public class Hilbert {
             }
         }
         // Goes through all the rows (i is the current-pivot-row)
-        for (int i = original.length - 1; i > 0; i--) {
-//            System.out.println("Original:\n" + new Matrix(original) + "\nInverse:\n" + new Matrix(inverse));
+        for (int i = original.length - 1; i >= 0; i--) {
+//            System.out.println("Original:\n" + new Matrix(original) +
+//                  "\nInverse:\n" + new Matrix(inverse));
             double pivot = original[i][i]; // TODO fix later if pivot = 0
             // Goes through all the rows underneath the "i'th" row
             for (int j = i - 1; j >= 0; j--) {
                 // Row reduce for original and copy operations to inverse
                 double ratio = original[j][i] / pivot;
-                // Row reduction (k - column)
+                // Row reduction (k -> column)
                 for (int k = 0; k < original[i].length; k++) {
                     original[j][k] -= original[i][k] * ratio;
                     inverse[j][k] -= inverse[i][k] * ratio;
                 }
             }
-            // Row reduce so inverse pivots are 1 (j - column)
+            // Row reduce so inverse pivots are 1 (j -> column)
             for (int j = i; j < inverse[i].length; j++) {
                 inverse[i][j] /= pivot;
             }
         }
 
         return new Matrix(inverse);
+    }
+
+    public static Matrix transpose(AbstractMatrix mat) {
+        double[][] trans = new double[mat.getCols()][mat.getRows()];
+        for (int i = 0; i < trans.length; i++) {
+            for (int j = 0; j < trans[0].length; j++) {
+                trans[i][j] = mat.get(j, i);
+            }
+        }
+        return new Matrix(trans);
     }
 
     public String toString() {
