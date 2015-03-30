@@ -69,7 +69,6 @@ public class LinearAlgebra {
      * @throws IllegalOperandException when dimensions don't match
      */
     public static Matrix matrixSubtract(AbstractMatrix m1, AbstractMatrix m2) {
-
         double[][] diff = new double[m1.getHeight()][m1.getWidth()];
         for (int i = 0; i < m1.getHeight(); i++) {
             for (int j = 0; j < m1.getWidth(); j++) {
