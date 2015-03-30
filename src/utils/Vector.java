@@ -149,7 +149,7 @@ public class Vector {
     
     /**
      * Gets sum of the elements of a vector.
-     * @return sume of vector elements
+     * @return sum of vector elements
      */
      public double getSum() {
          double sum = 0;
