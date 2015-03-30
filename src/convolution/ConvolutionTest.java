@@ -6,7 +6,9 @@ package convolution;
 public class ConvolutionTest {
 
     public static void main(String... args) {
-        findXWithY0Example();
+        findXWithY0ExampleJacobi();
+        findXWithY1ExampleJacobi();
+        testJacobiRandom(12);
     }
 
     public static void randomVecToString() {
@@ -34,7 +36,7 @@ public class ConvolutionTest {
         System.out.println(Convolution.findy1(x));
     }
 
-    public static void findXWithY0Example() {
+    public static void findXWithY0ExampleJacobi() {
         BitMatrix x0 = BitMatrix.intsToBoolsVec(1, 0, 0, 0, 0, 0, 0, 0);
         BitMatrix x = BitMatrix.intsToBoolsVec(1, 0, 1, 1, 0);
         BitMatrix y0 = Convolution.findy0(x);
@@ -44,6 +46,57 @@ public class ConvolutionTest {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    public static void findXWithY1ExampleJacobi() {
+        BitMatrix x0 = BitMatrix.intsToBoolsVec(1, 0, 0, 0, 0, 0, 0, 0);
+        BitMatrix x = BitMatrix.intsToBoolsVec(1, 0, 1, 1, 0);
+        BitMatrix y1 = Convolution.findy1(x);
+        BitMatrix a1 = Convolution.getA1(x.getRows());
+        try {
+            System.out.println(Convolution.jacobi(a1, y1, x0, 0));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void testJacobiRandom(int length) {
+        System.out.printf("Jacobi decoding with %d length input%n", length);
+        BitMatrix x = Convolution.getRandomVector(length);
+        System.out.println("This is x: " + x);
+        System.out.println("\nEncoding");
+        // Encode x -> y0
+        BitMatrix y0 = Convolution.findy0(x);
+        System.out.println("This is y0: " + y0);
+        // Encode y -> y1
+        BitMatrix y1 = Convolution.findy1(x);
+        System.out.println("This is y1: " + y1);
+
+        // find A0 and A1
+        BitMatrix a0 = Convolution.getA0(length);
+        BitMatrix a1 = Convolution.getA1(length);
+
+        // x0 (first guess)
+        BitMatrix x0 = new BitMatrix(new boolean[length + 3]);
+        System.out.println("\nDecoding");
+        try {
+            // Decode y0 -> x
+            BitMatrixAndCount y0x = Convolution.jacobi(a0, y0, x0, 0);
+            System.out.println("This is x from y0: " + y0x);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        try {
+            // Decode y1 ->
+            BitMatrixAndCount y1x = Convolution.jacobi(a1, y1, x0, 0);
+            System.out.println("This is x from y1: " + y1x);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        System.out.println("This is x (again): " + x);
+
+
     }
 
 }

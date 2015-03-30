@@ -10,6 +10,24 @@ public class Convolution {
     static Random r = new Random();
     static final int MAX_ITERATIONS = 500;
 
+    /**
+     * Performs Jacobi iteration to solve for vector x in Ax = y on
+     * matrices and vectors of booleans (bits).
+     * Jacobi iteration will continue until the difference between
+     * iterations is below the tolerance value. If MAX_ITERATIONS
+     * number of iterations has been performed and the difference
+     * is still above the tolerance value, then an Exception will
+     * be thrown describing this error.
+     *
+     * @param a matrix A
+     * @param y vector y
+     * @param x0 initial guess for vector x
+     * @param tol tolerance value
+     * @return the final vector x and the number of iterations
+     * performed
+     * @throws Exception when the tolerance value is unable to be
+     * attained even after MAX_ITERATIONS number of iterations
+     */
     public static BitMatrixAndCount jacobi(BitMatrix a, BitMatrix y,
                                            BitMatrix x0, double tol)
             throws Exception {
@@ -29,16 +47,14 @@ public class Convolution {
                 }
             }
         }
-        return jacobiHelp(new BitMatrix(luRaw), y, x0, tol * tol);
-    }
-
-    private static BitMatrixAndCount jacobiHelp(BitMatrix t, BitMatrix y,
-                                    BitMatrix prev, double tolSq)
-            throws Exception{
-
-        int count = 1;
-        int diffNormSq = 0;
+        BitMatrix t = new BitMatrix(luRaw);
+        double tolSq = tol * tol; // tolerance squared to make comparing
+                                  // to the norm of the difference easier
+                                  // (no square rooting)
+        int diffNormSq; // norm of the difference between iterations squared.
+        BitMatrix prev = x0;
         BitMatrix next = prev;
+        int count = 0; // number of iterations performed
         do {
             if (count > MAX_ITERATIONS) {
                 System.out.println(count);
@@ -50,14 +66,14 @@ public class Convolution {
             next = BitMatrix.matrixAdd(BitMatrix.matrixMultiply(t, next), y);
             // now we need to check if |xi1 - xi| < tol
             // BUT when bitwise, component-wise subtraction followed with
-            // squaring is the same as only component-wise addition
+            // squaring is the same as *only* component-wise addition
             BitMatrix diff = BitMatrix.matrixAdd(next, prev);
             diffNormSq = 0;
             for (int i = 0; i < diff.getRows(); i++) {
                 diffNormSq += diff.get(i, 0);
             }
             count++;
-            System.out.println(next);
+//            System.out.println(next + " Iteration: " + count);
         } while (diffNormSq > tolSq);
         return new BitMatrixAndCount(next, count);
     }
