@@ -156,5 +156,6 @@ public class Vector {
          for (double i : vector) {
              sum = sum + i;
         }
+        return sum;
     }
 }
