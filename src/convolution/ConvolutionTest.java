@@ -6,7 +6,7 @@ package convolution;
 public class ConvolutionTest {
 
     public static void main(String... args) {
-        findYExample();
+        findXWithY0Example();
     }
 
     public static void randomVecToString() {
@@ -32,6 +32,18 @@ public class ConvolutionTest {
         System.out.println(x);
         System.out.println(Convolution.findy0(x));
         System.out.println(Convolution.findy1(x));
+    }
+
+    public static void findXWithY0Example() {
+        BitMatrix x0 = BitMatrix.intsToBoolsVec(1, 0, 0, 0, 0, 0, 0, 0);
+        BitMatrix x = BitMatrix.intsToBoolsVec(1, 0, 1, 1, 0);
+        BitMatrix y0 = Convolution.findy0(x);
+        BitMatrix a0 = Convolution.getA0(x.getRows());
+        try {
+            System.out.println(Convolution.jacobi(a0, y0, x0, 0));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
 }
