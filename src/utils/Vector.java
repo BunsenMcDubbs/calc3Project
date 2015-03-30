@@ -80,14 +80,70 @@ public class Vector {
      * @return Vector normalized copy of the vector
      */
      public Vector normalizeVector() {
-         double[] newVec = new double[vector.length];
-         for (int i = 0; i < vector.length; i++) {
+        double[] newVec = new double[vector.length];
+        for (int i = 0; i < vector.length; i++) {
+            newVec[i] = vector[i];
+        }
+        double magVec = this.getMagnitude();
+        for (int i = 0; i < newVec.length; i++) {
+            newVec[i] = newVec[i]/magVec;
+        }
+        return new Vector(newVec);
+    }
+    
+    /**
+     * Returns absolute minimum of vector.
+     * @return absolute minimum of vector
+     */
+    public double getAbsMin() {
+        double min;
+        min = vector[0];
+        for (double i : vector) {
+            if (Math.abs(i) > min) {
+                min = i;
+            }
+        }
+        return min;
+    }
+    
+    /**
+     * Returns maximum element of vector.
+     * @return maximum element of vector
+     */
+    public double getMax() {
+        double max = vector[0];
+        for (double i : vector) {
+            if (i > max) {
+                max = i;
+            }
+        }
+        return max;
+    }
+    
+    /**
+     * Divides all elemnts of vector by a scalar
+     * @return vector divided by scalar
+     */
+    public Vector divideComponents(double quotient) {
+        double[] newVec = new double[vector.length];
+        for (int i = 0; i < vector.length; i++) {
              newVec[i] = vector[i];
-         }
-         double magVec = this.getMagnitude();
-         for (int i = 0; i < newVec.length; i++) {
-             newVec[i] = newVec[i]/magVec;
-         }
-         return new Vector(newVec);
-     }
+        }
+        for (int i = 0; i < newVec.length; i++) {
+            newVec[i] = newVec[i]/quotient;
+        }
+        return new Vector(newVec);
+    }
+    
+    /**
+     * Creates a copy of a vector.
+     * @return copied vector
+     */
+    public Vector deepCopy() {
+        double[] newVec = new double[vector.length];
+        for (int i = 0; i < vector.length; i++) {
+             newVec[i] = vector[i];
+        }
+        return new Vector(newVec);
+    }
 }
