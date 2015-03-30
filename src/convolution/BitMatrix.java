@@ -88,6 +88,24 @@ public class BitMatrix extends AbstractMatrix{
         return new BitMatrix(r);
     }
 
+    /**
+     * This method takes two BitMatrices and performs binary addition
+     * on the elements to produce a final result.
+     * @param a
+     * @param b
+     * @return
+     */
+    public static BitMatrix matrixAdd(BitMatrix a, BitMatrix b) {
+        boolean[][] r = new boolean[a.getRows()][b.getCols()];
+        for (int i = 0; i < r.length; i++) {
+            for (int j = 0; j < r[0].length; j++) {
+                // "XOR" aka "Add"
+                r[i][j] = a.getBool(i, j) != b.getBool(i, j);
+            }
+        }
+        return new BitMatrix(r);
+    }
+
     @Override
     public String toString() {
         String s = "";

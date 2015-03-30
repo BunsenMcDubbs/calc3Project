@@ -64,6 +64,7 @@ public class Test {
         Vector b = new Vector(new double[] {0.0464159, 0.0464159, 0.0464159, 0.0464159});
 
         System.out.println("solved x = " + Hilbert.solve_lu_b(mat, b));
+        System.out.println("|LU - A| = " + r.getError());
     }
 
     public static void sanityCheckLU() {
