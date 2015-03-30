@@ -121,7 +121,7 @@ public class Vector {
     }
     
     /**
-     * Divides all elemnts of vector by a scalar
+     * Divides all elements of vector by a scalar
      * @return vector divided by scalar
      */
     public Vector divideComponents(double quotient) {
@@ -145,5 +145,16 @@ public class Vector {
              newVec[i] = vector[i];
         }
         return new Vector(newVec);
+    }
+    
+    /**
+     * Gets sum of the elements of a vector.
+     * @return sume of vector elements
+     */
+     public double getSum() {
+         double sum = 0;
+         for (double i : vector) {
+             sum = sum + i;
+        }
     }
 }
