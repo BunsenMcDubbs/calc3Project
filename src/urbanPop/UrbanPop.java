@@ -5,7 +5,7 @@ import utils.*;
  * @version 1.0
  * Class that contains code for urban pop project.
  */ 
- package urbanPop;
+package urbanPop;
 public class UrbanPop {
     /**
      * Calculates largest eigen value and corresponding vector by power method.
