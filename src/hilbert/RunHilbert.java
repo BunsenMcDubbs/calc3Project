@@ -20,7 +20,7 @@ public class RunHilbert {
         for (int n = 2; n <= 20; n++) {
             System.out.println("\n*** n = " + n + " ***\n");
             Hilbert h = new Hilbert(n);
-            System.out.println("Hilbert Matrix:\n" + h);
+//            System.out.println("Hilbert Matrix:\n" + h);
             Vector b = makeB(n);
             System.out.println("b = " + b);
 

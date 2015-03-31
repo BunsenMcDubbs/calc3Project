@@ -223,12 +223,11 @@ public class Hilbert extends AbstractMatrix{
         MatFact qr = qr_fact_househ(a);
         Matrix q = qr.getA();
         Matrix r = qr.getB();
-        Matrix qT = transpose(q);
         // Ax = b
         // ==> QRx = b
         // ==> Rx = ((qT) (b))
-        Vector rx = LinearAlgebra.matrixVectorMultiply(qT, b);
-        return new VectorAndError(forwardSub(r, rx), qr.getError());
+        Vector qTb = LinearAlgebra.matrixVectorMultiply(transpose(q), b);
+        return new VectorAndError(backwardSub(r, qTb), qr.getError());
     }
 
     /**
@@ -244,12 +243,11 @@ public class Hilbert extends AbstractMatrix{
         MatFact qr = qr_fact_givens(a);
         Matrix q = qr.getA();
         Matrix r = qr.getB();
-        Matrix qT = transpose(q);
         // Ax = b
         // ==> QRx = b
-        // ==> x = (rInv) ((qT) (b))
-        Vector rx = LinearAlgebra.matrixVectorMultiply(qT, b);
-        return new VectorAndError(forwardSub(r, rx), qr.getError());
+        // ==> Rx = (qT) (b)
+        Vector qTb = LinearAlgebra.matrixVectorMultiply(transpose(q), b);
+        return new VectorAndError(backwardSub(r, qTb), qr.getError());
     }
 
     /**
@@ -306,6 +304,11 @@ public class Hilbert extends AbstractMatrix{
                 }
                 x[j] -= x[i] * ratio;
             }
+            // Row reduce so inverse pivots are 1 (j -> column)
+            for (int j = i; j < original[i].length; j++) {
+                original[i][j] /= pivot;
+            }
+            x[i] /= pivot;
         }
 
         return new Vector(x);
@@ -347,6 +350,11 @@ public class Hilbert extends AbstractMatrix{
                 }
                 x[j] -= x[i] * ratio;
             }
+            // Row reduce so inverse pivots are 1 (j -> column)
+            for (int j = i; j < original[i].length; j++) {
+                original[i][j] /= pivot;
+            }
+            x[i] /= pivot;
         }
 
         return new Vector(x);
