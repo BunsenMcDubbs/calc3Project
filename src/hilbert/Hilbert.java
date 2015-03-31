@@ -7,7 +7,7 @@ import java.util.HashMap;
 /**
  * Created by andrew on 3/23/15.
  */
-public class Hilbert extends AbstractMatrix{
+public class Hilbert extends AbstractMatrix {
 
     double[][] mat;
     static HashMap<Integer, Double> cheat = new HashMap<Integer, Double>();

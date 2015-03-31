@@ -137,10 +137,7 @@ public class Test {
         System.out.println("Ax = b = " + b);
 
         Matrix qt = Hilbert.transpose(r.getA());
-        Vector rx = LinearAlgebra.matrixVectorMultiply(r.getB(), x);
-        System.out.println(rx);
         Vector qtb = LinearAlgebra.matrixVectorMultiply(qt, b);
-        System.out.println(qtb);
         System.out.println(Hilbert.backwardSub(r.getB(), qtb));
     }
 }
