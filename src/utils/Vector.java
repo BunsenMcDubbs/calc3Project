@@ -95,7 +95,7 @@ public class Vector {
      * Returns absolute minimum of vector.
      * @return absolute minimum of vector
      */
-    public double getAbsMin() {
+    public double getMin() {
         double min;
         min = vector[0];
         for (double i : vector) {
@@ -107,13 +107,13 @@ public class Vector {
     }
     
     /**
-     * Returns maximum element of vector.
-     * @return maximum element of vector
+     * Returns absolute maximum element of vector.
+     * @return absolue maximum element of vector
      */
     public double getMax() {
         double max = vector[0];
         for (double i : vector) {
-            if (i > max) {
+            if (Math.abs(i) > max) {
                 max = i;
             }
         }
