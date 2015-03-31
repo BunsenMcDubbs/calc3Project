@@ -47,13 +47,14 @@ public class Convolution {
                         "before exceeding the maximum number of iterations" +
                         " (" + MAX_ITERATIONS + ")");
             }
-            System.out.println(next + " Iteration: " + count);
             prev = next;
             double[] nextRaw = new double[prev.getLength()];
             for (int i = 0; i < a.getRows(); i++) {
                 nextRaw[i] = y.get(i);
                 for (int j = 0; j < a.getCols(); j++) {
-                    nextRaw[i] += (a.get(i, j) * nextRaw[j]);
+                    if (i != j) {
+                        nextRaw[i] -= (a.get(i, j) * prev.get(j));
+                    }
                 }
                 nextRaw[i] /= a.get(i, i);
             }
@@ -103,7 +104,7 @@ public class Convolution {
                 double xiNext = b.get(i);
                 for (int j = 0; j < xRaw.length; j++) {
                     if (i != j) {
-                        xiNext += (xRaw[j] * a.get(i, j));
+                        xiNext -= (xRaw[j] * a.get(i, j));
                     }
                 }
                 xiNext /= a.get(i, i);
@@ -171,7 +172,10 @@ public class Convolution {
             for (int i = 0; i < a.getRows(); i++) {
                 nextRaw[i] = y.getBool(i, 0);
                 for (int j = 0; j < a.getCols(); j++) {
-                    nextRaw[i] = nextRaw[i] != (t.getBool(i, j) && nextRaw[j]);
+                    if (i != j) {
+                        nextRaw[i] = nextRaw[i] !=
+                                (t.getBool(i, j) && nextRaw[j]);
+                    }
                 }
             }
             next = new BitMatrix(nextRaw);

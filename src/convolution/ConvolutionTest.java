@@ -13,28 +13,11 @@ public class ConvolutionTest {
 //        findXWithY1ExampleJacobi();
 //        testInverseDown();
 //        findXWithY1ExampleGaussSeidel();
-//        testBitJacobiRandom(10000);
-//        System.out.println("\n\n");
-//        testBitGaussSeidelRandom(10000);
+//        testBitJacobiRandom(100);
+//        testBitGaussSeidelRandom(100);
+//        jacobiSanityTest();
+//        gaussSeidelSanityTest();
 
-        double[][] testMat = new double[][] {
-                {2, 0, 1},
-                {1, 3, 2},
-                {0, 2, 3}
-        };
-        Matrix mat = new Matrix(testMat);
-        Vector b = new Vector(new double[]{ 14, 12, 5 });
-        Vector x0 = new Vector(new double[3]);
-        System.out.println(mat);
-        System.out.println(b);
-        VectorAndCount xSol = null;
-        try {
-            xSol = Convolution.gauss_seidel(mat, b, x0, 10e-8);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        System.out.println(xSol.getVector());
-        System.out.println(LinearAlgebra.matrixVectorMultiply(mat, xSol.getVector()));
     }
 
     public static void randomVecToString() {
@@ -159,6 +142,58 @@ public class ConvolutionTest {
         }
 
         System.out.println("This is x (again): " + x);
+    }
+
+    public static void jacobiSanityTest() {
+        double[][] testMat = new double[][] {
+                {2, 0, 1},
+                {1, 3, 2},
+                {0, 2, 3}
+        };
+        Matrix mat = new Matrix(testMat);
+        Vector b = new Vector(new double[]{ 14, 12, 5 });
+        Vector x0 = new Vector(new double[3]);
+        System.out.println(mat);
+        VectorAndCount xSol = null;
+        try {
+            xSol = Convolution.jacobi(mat, b, x0, 10e-8);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        Vector xSolLu = Hilbert.solve_lu_b(mat, b).getVector();
+        System.out.println("xlu = " + xSolLu);
+        System.out.println("xgs = " + xSol.getVector());
+        System.out.println("Mat * xLU  = " +
+                LinearAlgebra.matrixVectorMultiply(mat, xSolLu));
+        System.out.println("Mat * xSol = " +
+                LinearAlgebra.matrixVectorMultiply(mat, xSol.getVector()));
+        System.out.println(b);
+    }
+
+    public static void gaussSeidelSanityTest() {
+        double[][] testMat = new double[][] {
+                {2, 0, 1},
+                {1, 3, 2},
+                {0, 2, 3}
+        };
+        Matrix mat = new Matrix(testMat);
+        Vector b = new Vector(new double[]{ 14, 12, 5 });
+        Vector x0 = new Vector(new double[3]);
+        System.out.println(mat);
+        VectorAndCount xSol = null;
+        try {
+            xSol = Convolution.gauss_seidel(mat, b, x0, 10e-8);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        Vector xSolLu = Hilbert.solve_lu_b(mat, b).getVector();
+        System.out.println("xlu = " + xSolLu);
+        System.out.println("xgs = " + xSol.getVector());
+        System.out.println("Mat * xLU  = " +
+                LinearAlgebra.matrixVectorMultiply(mat, xSolLu));
+        System.out.println("Mat * xSol = " +
+                LinearAlgebra.matrixVectorMultiply(mat, xSol.getVector()));
+        System.out.println(b);
     }
 
 }
