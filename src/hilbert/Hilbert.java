@@ -256,13 +256,14 @@ public class Hilbert extends AbstractMatrix {
      * @return the maximum value (absolute)
      */
     public static double norm(AbstractMatrix mat) {
-        double norm = Math.abs(mat.get(0, 0));
+        double norm = -1;
         for (int i = 0; i < mat.getRows(); i++) {
+            double absRowSum = 0;
             for (int j = 0; j < mat.getCols(); j++) {
-                double curr = Math.abs(mat.get(i, j));
-                if (curr > norm) {
-                    norm = curr;
-                }
+                absRowSum += Math.abs(mat.get(i, j));
+            }
+            if (absRowSum > norm) {
+                norm = absRowSum;
             }
         }
         return norm;
