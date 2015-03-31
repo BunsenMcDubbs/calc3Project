@@ -1,6 +1,11 @@
 package convolution;
 
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.List;
+
+import utils.*;
 
 /**
  * Created by andrew on 3/31/15.
@@ -17,11 +22,16 @@ public class RunConvolution {
             printHelp();
         } else {
             String option = args[0];
-            if (option.equals("-f")) {
+            if (option.equals("-iteration")) {
                 if (args.length != 2) {
                     System.out.println("Please include the path to the file");
                 } else {
-                    // TODO file stuff
+                    try {
+                        iteration(args[1]);
+                    } catch (IOException e) {
+                        System.out.printf("File at path %s could not be" +
+                                " found%n", args[1]);
+                    }
                 }
             } else if (option.equals("-h")) {
                 printHelp();
@@ -31,6 +41,19 @@ public class RunConvolution {
                     length = Integer.parseInt(args[1]);
                 }
                 encode(length, option.equals("-ep"));
+            } else if (option.equals("-d")) {
+                if (args.length != 2) {
+                    System.out.println("Please include the path to the file");
+                } else {
+                    try {
+                        decode(Files.readAllLines(
+                                FileSystems.getDefault()
+                                        .getPath(args[1])).get(0));
+                    } catch (IOException e) {
+                        System.out.printf("File at path %s could not be" +
+                                " found%n", args[1]);
+                    }
+                }
             }
         }
     }
@@ -92,15 +115,66 @@ public class RunConvolution {
         System.out.println("y1 -> x = " + Convolution.gaussSeidelFindXFromY1(y1));
     }
 
+    public static void iteration(String path) throws IOException {
+        List<String> lines = Files.readAllLines(
+                FileSystems.getDefault()
+                        .getPath(path));
+
+        int size = lines.get(0).split(" ").length - 1;
+        double[][] aRaw = new double[size][size];
+        double[] bRaw = new double[size];
+        double[] x0Raw = new double[size];
+        double tol = 0;
+
+        for (int i = 0; i < size; i++) {
+            String[] line = lines.get(i).split(" ");
+            for (int j = 0; j < size; j++) {
+                aRaw[i][j] = Double.parseDouble(line[j]);
+            }
+            bRaw[i] = Double.parseDouble(line[size]);
+            x0Raw[i] = Double.parseDouble(lines.get(i + size));
+        }
+        tol = Double.parseDouble(lines.get(size * 2));
+
+        Matrix a = new Matrix(aRaw);
+        Vector b = new Vector(bRaw);
+        Vector x0 = new Vector(x0Raw);
+        System.out.println("Matrix A:\n" + a);
+        System.out.println("Vector b: " + b);
+        System.out.println("Vector x0: " + x0);
+        System.out.println("Tolerance: " + tol);
+
+        System.out.println("Solving for x with Jacobi iterations");
+        try {
+            System.out.println("xSol = " + Convolution.jacobi(a, b, x0, tol));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        System.out.println("Solving for x with Gauss Seidel iterations");
+        try {
+            System.out.println("xSol = " + Convolution.gauss_seidel(a, b, x0, tol));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     public static void printHelp() {
         String s = "Here are your options:\n" +
-//                "\t-i\tInteractive mode\n" +
-                "\t-f\tRead from a file (include the path to the file)\n" +
-                    "\t\tex) -f /path/to/file.dat\n" +
+                "\t-iteration\tUse iteration methods (Jacobi and Gauss Seidel)" +
+                "to solve of x in Ax = b, given A, b and a tolerance" +
+                " (include the path to the file)\n" +
+                    "\t\tex) -iterate /path/to/file.dat\n" +
                 "\t-e\tGenerate and encode a random binary stream" +
                 "(include length, default = 20)\n" +
                     "\t\tex) -e 100\n" +
                 "\t-ep\tSame as -e except also print out matrices A0 and A1\n" +
+                "\t-d\tDecode x from a given y (include path to the file)" +
+                    "\n\t\tThe decoding will be done twice, once with Jacobi " +
+                    "iterations and once with Gauss Seidel iterations." +
+                    "\n\t\tNote: the bits are treated as bits which is faster " +
+                    "and more memory efficient than approximating bits with " +
+                    "floating point numbers\n" +
                 "\t-h\tDisplay this help dialog\n";
         System.out.println(s);
     }

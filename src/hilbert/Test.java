@@ -115,9 +115,9 @@ public class Test {
 
     public static void sanityCheckQRHouse() {
         double[][] testMat = new double[][] {
-                {1, 2, 3},
-                {0, 3, 2},
-                {2, 0, 1}
+                {2, 0, 1},
+                {1, 3, 2},
+                {0, 2, 3}
         };
         Matrix mat = new Matrix(testMat);
 

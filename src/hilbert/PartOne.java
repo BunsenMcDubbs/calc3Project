@@ -169,17 +169,28 @@ public class PartOne {
 
             System.out.println("\nSolving for x with LU factorization:");
             VectorAndError luX = Hilbert.solve_lu_b(h, b);
-            System.out.println(solveVia(luX, h, b, "LU"));
+            System.out.println(solveHilbertVia(luX, h, b, "LU"));
 
             System.out.println("\nSolving for x with QR factorization (Householders):");
             VectorAndError qrHX = Hilbert.solve_qr_b(h, b);
-            System.out.println(solveVia(qrHX, h, b, "QR"));
+            System.out.println(solveHilbertVia(qrHX, h, b, "QR"));
 
 
             System.out.println("\nSolving for x with QR factorization (Givens):");
             VectorAndError qrGX = Hilbert.solve_qr_b_givens(h, b);
-            System.out.println(solveVia(qrGX, h, b, "QR"));
+            System.out.println(solveHilbertVia(qrGX, h, b, "QR"));
         }
+    }
+
+    private static String solveHilbertVia (VectorAndError x, AbstractMatrix h,
+                                    Vector b, String method) {
+        String s = "Solved x = " + x.getVector();
+        double vecErr = LinearAlgebra.vectorSubtract(
+                LinearAlgebra.matrixVectorMultiply(h, x.getVector()), b)
+                .getMagnitude();
+        s += "\n||Hx(" + method.toLowerCase() + ") - b|| = " + vecErr;
+        s += "\n||" + method + " - H|| = " + x.getError();
+        return s;
     }
 
     private static String solveVia (VectorAndError x, AbstractMatrix h,
@@ -188,8 +199,8 @@ public class PartOne {
         double vecErr = LinearAlgebra.vectorSubtract(
                 LinearAlgebra.matrixVectorMultiply(h, x.getVector()), b)
                 .getMagnitude();
-        s += "\n||Hx(" + method.toLowerCase() + ") - b|| = " + vecErr;
-        s += "\n||" + method + " - H|| = " + x.getError();
+        s += "\n||Ax(" + method.toLowerCase() + ") - b|| = " + vecErr;
+        s += "\n||" + method + " - A|| = " + x.getError();
         return s;
     }
 
