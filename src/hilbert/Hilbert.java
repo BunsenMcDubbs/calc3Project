@@ -201,14 +201,12 @@ public class Hilbert extends AbstractMatrix{
      */
     public static VectorAndError solve_lu_b(AbstractMatrix a, Vector b) {
         MatFact lu = lu_fact(a);
-        Matrix lInv = inverseDown(lu.getA());
-        Matrix uInv = inverseUp(lu.getB());
         // Ax = b
         // A = LU
-        // LUx = b
-        // x = (Uinv)(Linv)b
-        Vector x = LinearAlgebra.matrixVectorMultiply(uInv,
-                LinearAlgebra.matrixVectorMultiply(lInv, b));
+        // Ly = b
+        // Ux = y
+        Vector y = forwardSub(lu.getA(), b);
+        Vector x = backwardSub(lu.getB(), y);
         return new VectorAndError(x, lu.getError());
     }
 
@@ -226,13 +224,11 @@ public class Hilbert extends AbstractMatrix{
         Matrix q = qr.getA();
         Matrix r = qr.getB();
         Matrix qT = transpose(q);
-        Matrix rInv = inverseUp(r);
         // Ax = b
         // ==> QRx = b
-        // ==> x = (rInv) ((qT) (b))
-        Vector x = LinearAlgebra.matrixVectorMultiply(rInv,
-                LinearAlgebra.matrixVectorMultiply(qT, b));
-        return new VectorAndError(x, qr.getError());
+        // ==> Rx = ((qT) (b))
+        Vector rx = LinearAlgebra.matrixVectorMultiply(qT, b);
+        return new VectorAndError(forwardSub(r, rx), qr.getError());
     }
 
     /**
@@ -249,13 +245,11 @@ public class Hilbert extends AbstractMatrix{
         Matrix q = qr.getA();
         Matrix r = qr.getB();
         Matrix qT = transpose(q);
-        Matrix rInv = inverseUp(r);
         // Ax = b
         // ==> QRx = b
         // ==> x = (rInv) ((qT) (b))
-        Vector x = LinearAlgebra.matrixVectorMultiply(rInv,
-                LinearAlgebra.matrixVectorMultiply(qT, b));
-        return new VectorAndError(x, qr.getError());
+        Vector rx = LinearAlgebra.matrixVectorMultiply(qT, b);
+        return new VectorAndError(forwardSub(r, rx), qr.getError());
     }
 
     /**
@@ -279,22 +273,23 @@ public class Hilbert extends AbstractMatrix{
     /**
      * Finds the inverse of a matrix with forwards substitution
      * @param mat given matrix (lower triangular)
+     * @param b
      * @return inverse of the given matrix
      */
-    public static Matrix inverseDown(AbstractMatrix mat) {
+    public static Vector forwardSub(AbstractMatrix mat, Vector b) {
         if (mat.getRows() != mat.getCols()) {
             System.out.println("Matrix must be square to be invertible");
             return null;
         }
-        double[][] inverse = new double[mat.getRows()][mat.getRows()];
         double[][] original = new double[mat.getRows()][mat.getRows()];
+        double[] x = new double[b.getLength()];
 
         // Copy matrix mat to original
         for (int row = 0; row < mat.getRows(); row++) {
-            inverse[row][row] = 1; // makes L into an identity matrix
             for (int col = 0; col < mat.getCols(); col++) {
                 original[row][col] = mat.get(row, col);
             }
+            x[row] = b.get(row);
         }
         // Goes through all the rows (i is the current-pivot-row)
         for (int i = 0; i < original.length; i++) {
@@ -308,37 +303,34 @@ public class Hilbert extends AbstractMatrix{
                 // Row reduction (k - column)
                 for (int k = 0; k < original[i].length; k++) {
                     original[j][k] -= original[i][k] * ratio;
-                    inverse[j][k] -= inverse[i][k] * ratio;
                 }
-            }
-            // Row reduce so inverse pivots are 1 (j -> column)
-            for (int j = i; j < inverse[i].length; j++) {
-                inverse[i][j] /= pivot;
+                x[j] -= x[i] * ratio;
             }
         }
 
-        return new Matrix(inverse);
+        return new Vector(x);
     }
 
     /**
      * Finds the inverse of a matrix with backwards substitution
      * @param mat given matrix (upper triangular)
+     * @param b
      * @return inverse of the given matrix
      */
-    public static Matrix inverseUp(AbstractMatrix mat) {
+    public static Vector backwardSub(AbstractMatrix mat, Vector b) {
         if (mat.getRows() != mat.getCols()) {
             System.out.println("Matrix must be square to be invertible");
             return null;
         }
-        double[][] inverse = new double[mat.getRows()][mat.getRows()];
         double[][] original = new double[mat.getRows()][mat.getRows()];
+        double[] x = new double[b.getLength()];
 
         // Copy matrix mat to original
         for (int row = 0; row < mat.getRows(); row++) {
-            inverse[row][row] = 1; // makes L into an identity matrix
             for (int col = 0; col < mat.getCols(); col++) {
                 original[row][col] = mat.get(row, col);
             }
+            x[row] = b.get(row);
         }
         // Goes through all the rows (i is the current-pivot-row)
         for (int i = original.length - 1; i >= 0; i--) {
@@ -352,16 +344,12 @@ public class Hilbert extends AbstractMatrix{
                 // Row reduction (k -> column)
                 for (int k = 0; k < original[i].length; k++) {
                     original[j][k] -= original[i][k] * ratio;
-                    inverse[j][k] -= inverse[i][k] * ratio;
                 }
-            }
-            // Row reduce so inverse pivots are 1 (j -> column)
-            for (int j = i; j < inverse[i].length; j++) {
-                inverse[i][j] /= pivot;
+                x[j] -= x[i] * ratio;
             }
         }
 
-        return new Matrix(inverse);
+        return new Vector(x);
     }
 
     public static Matrix transpose(AbstractMatrix mat) {

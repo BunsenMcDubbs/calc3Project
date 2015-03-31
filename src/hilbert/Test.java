@@ -11,7 +11,7 @@ import utils.Vector;
 public class Test {
 
     public static void main(String... args) {
-        hilbertLUTest();
+        sanityCheckLU();
     }
 
     public static void hilbertQRGivensTest() {
@@ -83,23 +83,12 @@ public class Test {
         System.out.println("L x U = A?");
         System.out.println(LinearAlgebra.matrixMultiply(r.getA(), r.getB()));
 
-        System.out.println("L inverse");
-        Matrix lInv = Hilbert.inverseDown(r.getA());
-        System.out.println(lInv);
-        System.out.println("U inverse");
-        Matrix uInv = Hilbert.inverseUp(r.getB());
-        System.out.println(uInv);
-
         System.out.println("Solve for b (Ax = b)");
         double[] testX = new double[] {1, 2, 3};
         Vector x = new Vector(testX);
         System.out.println("actual x = " + x);
         Vector b = LinearAlgebra.matrixVectorMultiply(mat, x);
         System.out.println("Ax = b = " + b);
-
-        Vector temp = LinearAlgebra.matrixVectorMultiply(lInv, b);
-        System.out.println("(lInv) * b = temp = " + temp);
-        System.out.println("(uInv) * temp = " + LinearAlgebra.matrixVectorMultiply(uInv, temp));
 
         System.out.println("solved x = " + Hilbert.solve_lu_b(mat, b));
     }
