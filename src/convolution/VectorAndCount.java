@@ -1,14 +1,15 @@
 package convolution;
 
+import utils.Vector;
 /**
  * Created by andrew on 3/29/15.
  */
-public class BitMatrixAndCount {
+public class VectorAndCount {
 
-    private final BitMatrix v;
+    private final Vector v;
     private final int count;
 
-    public BitMatrixAndCount(BitMatrix v, int count) {
+    public VectorAndCount(Vector v, int count) {
         this.v = v;
         this.count = count;
     }
@@ -17,7 +18,7 @@ public class BitMatrixAndCount {
         return count;
     }
 
-    public BitMatrix getVector() {
+    public Vector getVector() {
         return v;
     }
 
