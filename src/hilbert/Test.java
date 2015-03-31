@@ -141,7 +141,6 @@ public class Test {
         System.out.println(rx);
         Vector qtb = LinearAlgebra.matrixVectorMultiply(qt, b);
         System.out.println(qtb);
-        System.out.println(LinearAlgebra.matrixVectorMultiply(Hilbert.inverseUp(r.getB()), qtb));
         System.out.println(Hilbert.backwardSub(r.getB(), qtb));
     }
 }

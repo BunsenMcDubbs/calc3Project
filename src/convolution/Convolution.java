@@ -62,7 +62,14 @@ public class Convolution {
                         " (" + MAX_ITERATIONS + ")");
             }
             prev = next;
-            next = BitMatrix.matrixAdd(BitMatrix.matrixMultiply(t, next), y);
+            boolean[] nextRaw = new boolean[prev.getRows()];
+            for (int i = 0; i < a.getRows(); i++) {
+                nextRaw[i] = y.getBool(i, 0);
+                for (int j = 0; j < a.getCols(); j++) {
+                    nextRaw[i] = nextRaw[i] != (t.getBool(i, j) && nextRaw[j]);
+                }
+            }
+            next = new BitMatrix(nextRaw);
             // now we need to check if |xi1 - xi| < tol
             // BUT when bitwise, component-wise subtraction followed with
             // squaring is the same as *only* component-wise addition
@@ -121,48 +128,6 @@ public class Convolution {
         } while (diffNormSq > tolSq);
         return new BitMatrixAndCount(new BitMatrix(xRaw), count);
     }
-
-    /**
-     * Finds the inverse of a matrix with forwards substitution
-     * @param mat given matrix (lower triangular)
-     * @return inverse of the given matrix
-     */
-    public static BitMatrix inverseDown(BitMatrix mat) {
-        if (mat.getRows() != mat.getCols()) {
-            System.out.println("Matrix must be square to be invertible");
-            return null;
-        }
-        boolean[][] inverse = new boolean[mat.getRows()][mat.getRows()];
-        boolean[][] original = new boolean[mat.getRows()][mat.getRows()];
-
-        // Copy matrix mat to original
-        for (int row = 0; row < mat.getRows(); row++) {
-            inverse[row][row] = true; // start with inverse as identity matrix
-            for (int col = 0; col < mat.getCols(); col++) {
-                original[row][col] = mat.getBool(row, col);
-            }
-        }
-        // Goes through all the rows (i is the current-pivot-row)
-        for (int i = 0; i < original.length; i++) {
-            // Assume pivots are already 1 because else... this is hard
-            // Goes through all the rows underneath the "i'th" row (j -> row)
-            for (int j = i + 1; j < original.length; j++) {
-                // Row reduce for original and copy operations to inverse
-                // Row reduction (k - column)
-                // stop if original[j][i] (element below pivot) is false/0
-                // because no substitution is needed
-                for (int k = 0; original[j][i] && k < original[i].length; k++) {
-                    // != (XOR) is sort of like ADDITION/SUBTRACTION
-                    original[j][k] = original[j][k] != original[i][k];
-                    inverse[j][k] = inverse[j][k] != inverse[i][k];
-                }
-            }
-            // Don't need to row reduce inverse because pivots are all 1
-        }
-
-        return new BitMatrix(inverse);
-    }
-
 
     public static BitMatrix getRandomVector(int length) {
         boolean[] v = new boolean[length];

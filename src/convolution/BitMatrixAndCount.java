@@ -22,6 +22,6 @@ public class BitMatrixAndCount {
     }
 
     public String toString() {
-        return v.toString() + " Iteration count = " + count;
+        return v.toString() + "\nIteration count = " + count;
     }
 }

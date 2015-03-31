@@ -10,10 +10,11 @@ public class ConvolutionTest {
     public static void main(String... args) {
 //        findXWithY0ExampleJacobi();
 //        findXWithY1ExampleJacobi();
-//        testJacobiRandom(20);
 //        testInverseDown();
 //        findXWithY1ExampleGaussSeidel();
-        testGaussSeidelRandom(100);
+        testJacobiRandom(10000);
+        System.out.println("\n\n");
+        testGaussSeidelRandom(10000);
     }
 
     public static void randomVecToString() {
@@ -125,14 +126,16 @@ public class ConvolutionTest {
         try {
             // Decode y0 -> x
             BitMatrixAndCount y0x = Convolution.gauss_seidel(a0, y0, x0, 0);
-            System.out.println("This is x from y0: " + y0x);
+//            System.out.println("This is x from y0: " + y0x);
+            System.out.println("This is x from y0: ");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         try {
             // Decode y1 ->
             BitMatrixAndCount y1x = Convolution.gauss_seidel(a1, y1, x0, 0);
-            System.out.println("This is x from y1: " + y1x);
+            System.out.println("This is x from y1: ");
+//            System.out.println("This is x from y1: " + y1x);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -153,24 +156,6 @@ public class ConvolutionTest {
         }
     }
 
-    public static void testInverseDown() {
-        System.out.println("Square, predefined A0 for a length 5 input (8x8)");
-        BitMatrix a0 = Convolution.getA0Square(5);
-        System.out.println(a0);
-        System.out.println("Its inverse");
-        BitMatrix a0Inv = Convolution.inverseDown(a0);
-        System.out.println(a0Inv);
-        System.out.println("A0 * A0Inv = I?");
-        System.out.println(BitMatrix.matrixMultiply(a0, a0Inv));
 
-
-        System.out.println("Square, predefined A1 for a length 5 input (8x8)");
-        BitMatrix a1 = Convolution.getA1Square(5);
-        System.out.println(a1);
-        BitMatrix a1Inv = Convolution.inverseDown(a1);
-        System.out.println(a1Inv);
-        System.out.println("A0 * A0Inv = I?");
-        System.out.println(BitMatrix.matrixMultiply(a1, a1Inv));
-    }
 
 }
