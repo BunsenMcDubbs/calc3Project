@@ -10,7 +10,7 @@ import utils.*;
 /**
  * Created by andrew on 3/31/15.
  */
-public class RunConvolution {
+public class PartTwo {
 
     /**
      *
