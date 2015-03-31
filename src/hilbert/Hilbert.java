@@ -337,7 +337,7 @@ public class Hilbert extends AbstractMatrix{
 //            System.out.println("Original:\n" + new Matrix(original) +
 //                  "\nInverse:\n" + new Matrix(inverse));
             double pivot = original[i][i]; // TODO fix later if pivot = 0
-            // Goes through all the rows underneath the "i'th" row
+            // Goes through all the rows above the "i'th" row
             for (int j = i - 1; j >= 0; j--) {
                 // Row reduce for original and copy operations to inverse
                 double ratio = original[j][i] / pivot;
