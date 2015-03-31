@@ -246,6 +246,46 @@ public class Convolution {
         return new BitMatrix(v);
     }
 
+    public static BitMatrix jacobiFindXFromY0(BitMatrix y0) {
+        BitMatrix a0 = getA0(y0.getRows() - 3);
+        BitMatrix x0 = new BitMatrix(new boolean[y0.getRows() - 3]);
+        try {
+            return jacobi(a0, y0, x0, 0).getVector();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static BitMatrix jacobiFindXFromY1(BitMatrix y1) {
+        BitMatrix a1 = getA1(y1.getRows() - 3);
+        BitMatrix x0 = new BitMatrix(new boolean[y1.getRows() - 3]);
+        try {
+            return jacobi(a1, y1, x0, 0).getVector();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static BitMatrix gaussSeidelFindXFromY0(BitMatrix y0) {
+        BitMatrix a0 = getA0(y0.getRows() - 3);
+        BitMatrix x0 = new BitMatrix(new boolean[y0.getRows() - 3]);
+        try {
+            return gauss_seidel(a0, y0, x0, 0).getVector();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static BitMatrix gaussSeidelFindXFromY1(BitMatrix y1) {
+        BitMatrix a1 = getA1(y1.getRows() - 3);
+        BitMatrix x0 = new BitMatrix(new boolean[y1.getRows() - 3]);
+        try {
+            return gauss_seidel(a1, y1, x0, 0).getVector();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public static BitMatrix findy0(boolean[] xRaw) {
         return findy0(new BitMatrix(xRaw));
     }

@@ -22,6 +22,14 @@ public class BitMatrix extends AbstractMatrix{
         }
     }
 
+    public BitMatrix(Boolean[] vec) {
+        super(vec.length, 1);
+        mat = new boolean[vec.length][1];
+        for (int i = 0; i < vec.length; i++) {
+            mat[i][0] = vec[i];
+        }
+    }
+
     public BitMatrix(int[][] ints) {
         super(ints.length, ints[0].length);
         mat = new boolean[ints.length][ints[0].length];
