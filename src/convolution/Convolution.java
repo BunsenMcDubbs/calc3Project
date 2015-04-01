@@ -138,22 +138,6 @@ public class Convolution {
                                            BitMatrix x0, double tol)
             throws Exception {
 
-        // Copying the diagonal out the given matrix (a)
-        // BUT because the diagonal MUST be all "1's" then it
-        // would resemble an identity matrix. Thus, we can simply
-        // delete them from matrix (a) and pretend we are still
-        // using it.
-        // "luRaw" the boolean matrix of (a) with the diagonal
-        // elements set to 0/false.
-        boolean[][] luRaw = new boolean[a.getRows()][a.getCols()];
-        for (int i = 0; i < a.getRows(); i++) {
-            for (int j = 0; j < a.getCols(); j++) {
-                if (i != j) {
-                    luRaw[i][j] = a.getBool(i, j);
-                }
-            }
-        }
-        BitMatrix t = new BitMatrix(luRaw);
         double tolSq = tol * tol; // tolerance squared to make comparing
                                   // to the norm of the difference easier
                                   // (no square rooting)
@@ -169,12 +153,12 @@ public class Convolution {
             }
             prev = next;
             boolean[] nextRaw = new boolean[prev.getRows()];
-            for (int i = 0; i < a.getRows(); i++) {
+            for (int i = 0; i < nextRaw.length; i++) {
                 nextRaw[i] = y.getBool(i, 0);
                 for (int j = 0; j < a.getCols(); j++) {
                     if (i != j) {
                         nextRaw[i] = nextRaw[i] !=
-                                (t.getBool(i, j) && nextRaw[j]);
+                                (a.getBool(i, j) && nextRaw[j]);
                     }
                 }
             }
@@ -252,6 +236,8 @@ public class Convolution {
         try {
             return jacobi(a0, y0, x0, 0).getVector();
         } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
@@ -262,6 +248,7 @@ public class Convolution {
         try {
             return jacobi(a1, y1, x0, 0).getVector();
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return null;
         }
     }
@@ -272,6 +259,7 @@ public class Convolution {
         try {
             return gauss_seidel(a0, y0, x0, 0).getVector();
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return null;
         }
     }
@@ -282,6 +270,7 @@ public class Convolution {
         try {
             return gauss_seidel(a1, y1, x0, 0).getVector();
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return null;
         }
     }

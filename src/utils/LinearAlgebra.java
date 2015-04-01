@@ -16,7 +16,6 @@ public class LinearAlgebra {
      * @param m matrix
      * @param v vector to multiply with the matrix
      * @return resulting vector
-     * @throws IllegalOperandException when dimensions don't match
      */
     public static Vector matrixVectorMultiply(AbstractMatrix m, Vector v) {
 
@@ -47,7 +46,6 @@ public class LinearAlgebra {
      * @param m1 - first matrix
      * @param m2 - second matrix
      * @return the matrix sum
-     * @throws IllegalOperandException when dimensions don't match
      */
     public static Matrix matrixAdd(Matrix m1, Matrix m2) {
 
@@ -66,7 +64,6 @@ public class LinearAlgebra {
      * @param m1 - first matrix
      * @param m2 - second matrix
      * @return the matrix sum
-     * @throws IllegalOperandException when dimensions don't match
      */
     public static Matrix matrixSubtract(AbstractMatrix m1, AbstractMatrix m2) {
         double[][] diff = new double[m1.getHeight()][m1.getWidth()];
@@ -102,30 +99,6 @@ public class LinearAlgebra {
             }
         }
         return new Matrix(r);
-    }
-
-    /**
-     * Returns the dot product of two given vectors.
-     *
-     * @param v1 - first vector
-     * @param v2 - second vector
-     * @return dot product as a double value
-     * @throws IllegalOperandException when dimensions don't match
-     */
-    public static double dotProduct(Vector v1, Vector v2) throws
-        IllegalOperandException {
-
-        if (v1.getLength() != v2.getLength()) {
-            String s = "Cannot obtain the dot product of two vectors of "
-                + "different lengths.\n"
-                + "(" + v1.getLength() + " and " + v2.getLength() + ")";
-            throw new IllegalOperandException(s);
-        }
-        double dot = 0;
-        for (int i = 0; i < v1.getLength(); i++) {
-            dot += v1.get(i) * v2.get(i);
-        }
-        return dot;
     }
 
     /**

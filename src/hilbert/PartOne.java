@@ -17,38 +17,43 @@ public class PartOne {
             printHelp();
         } else if (args[0].equals("-hilberts")) {
             hilberts();
-        } else if (args[0].equals("-solve")) {
-            Object[] temp = readAugmentedMatrixFromFile(args[1]);
-            Matrix a = (Matrix) temp[0];
-            Vector b = (Vector) temp[1];
-            System.out.println("\nSolving for x with LU factorization:");
-            VectorAndError luX = Hilbert.solve_lu_b(a, b);
-            System.out.println(solveVia(luX, a, b, "LU"));
-
-            System.out.println("\nSolving for x with QR factorization (Householders):");
-            VectorAndError qrHX = Hilbert.solve_qr_b(a, b);
-            System.out.println(solveVia(qrHX, a, b, "QR"));
-
-
-            System.out.println("\nSolving for x with QR factorization (Givens):");
-            VectorAndError qrGX = Hilbert.solve_qr_b_givens(a, b);
-            System.out.println(solveVia(qrGX, a, b, "QR"));
-        } else {
+        } else if (args.length == 2){
             String path = args[1];
             String opt = args[0];
-            Matrix a = readMatrixFromFile(path);
             if (opt.equals("-lu") || opt.equals("-all")) {
+                Matrix a = readMatrixFromFile(path);
                 lu(a);
             }
             if (opt.equals("-house") || opt.equals("-qr")
                     || opt.equals("-all")) {
+                Matrix a = readMatrixFromFile(path);
                 householders(a);
             }
             if (opt.equals("-givens") || opt.equals("-qr")
                     || opt.equals("-all")) {
+                Matrix a = readMatrixFromFile(path);
                 givens(a);
             }
+            if (opt.equals("-solve")) {
+                Object[] temp = readAugmentedMatrixFromFile(args[1]);
+                Matrix a1 = (Matrix) temp[0];
+                Vector b = (Vector) temp[1];
+                System.out.println("\nSolving for x with LU factorization:");
+                VectorAndError luX = Hilbert.solve_lu_b(a1, b);
+                System.out.println(solveVia(luX, a1, b, "LU"));
 
+                System.out.println("\nSolving for x with QR factorization (Householders):");
+                VectorAndError qrHX = Hilbert.solve_qr_b(a1, b);
+                System.out.println(solveVia(qrHX, a1, b, "QR"));
+
+
+                System.out.println("\nSolving for x with QR factorization (Givens):");
+                VectorAndError qrGX = Hilbert.solve_qr_b_givens(a1, b);
+                System.out.println(solveVia(qrGX, a1, b, "QR"));
+            }
+        } else {
+            System.out.println("Your command was not valid or you forgot" +
+                    " to specify a path to an input file");
         }
     }
 
@@ -65,6 +70,7 @@ public class PartOne {
         for (int i = 0; i < size; i++) {
             String[] line = lines.get(i).split(" ");
             for (int j = 0; j < size; j++) {
+                System.out.println(line.length);
                 raw[i][j] = Double.parseDouble(line[j]);
             }
         }

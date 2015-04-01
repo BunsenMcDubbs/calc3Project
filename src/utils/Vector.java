@@ -29,11 +29,7 @@ public class Vector {
      * @return double located at index 'i' in vector
      */
     public double get(int i) {
-        try {
-            return vector[i];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new VectorIndexOutOfBoundsException(i);
-        }
+        return vector[i];
     }
 
     /**

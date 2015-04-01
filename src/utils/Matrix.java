@@ -29,11 +29,7 @@ public final class Matrix extends AbstractMatrix{
      * @return double located at row i and column j in matrix
      */
     public double get(int i, int j) {
-        try {
-            return matrix[i][j];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new MatrixIndexOutOfBoundsException(i, j);
-        }
+        return matrix[i][j];
     }
 
     public Vector getCol(int j) {
