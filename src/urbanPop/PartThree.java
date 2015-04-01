@@ -126,7 +126,7 @@ public class PartThree {
     
     private static void printHelp() {
         String s = "These are your options:\n" +
-                "\t-power\t Do power method wiht defined matrix and vector\n " +
+                "\t-power\t Do power method with defined matrix and vector\n " +
                 "\t-default\t power method with default starting vector" +
                 "\t-h\t Print this help message\n";
         System.out.println(s);
