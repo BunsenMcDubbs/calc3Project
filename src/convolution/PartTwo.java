@@ -99,8 +99,14 @@ public class PartTwo {
             System.out.println("The length of the input must be even " +
                     "(y0 and y1 must be of equal length)");
         }
-        BitMatrix y0 = new BitMatrix((Boolean[]) y0Raw.toArray());
-        BitMatrix y1 = new BitMatrix((Boolean[]) y1Raw.toArray());
+        boolean[] y0Raw1 = new boolean[y0Raw.size()];
+        boolean[] y1Raw1 = new boolean[y1Raw.size()];
+        for (int i = 0; i < y0Raw.size(); i++) {
+            y0Raw1[i] = y0Raw.get(i);
+            y1Raw1[i] = y1Raw.get(i);
+        }
+        BitMatrix y0 = new BitMatrix(y0Raw1);
+        BitMatrix y1 = new BitMatrix(y1Raw1);
 
         System.out.println("Solving with Jacobi iterations (with bit math)");
         System.out.println("y0 = " + y0);

@@ -33,7 +33,7 @@ public class PartOne {
             System.out.println("\nSolving for x with QR factorization (Givens):");
             VectorAndError qrGX = Hilbert.solve_qr_b_givens(a, b);
             System.out.println(solveVia(qrGX, a, b, "QR"));
-        } else {
+        } else if (args.length == 2){
             String path = args[1];
             String opt = args[0];
             Matrix a = readMatrixFromFile(path);
@@ -48,7 +48,9 @@ public class PartOne {
                     || opt.equals("-all")) {
                 givens(a);
             }
-
+        } else {
+            System.out.println("Your command was not valid or you forgot" +
+                    " to specify a path to an input file");
         }
     }
 
