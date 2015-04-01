@@ -154,6 +154,7 @@ public class PartOne {
                 "matrix (include file path)\n" +
                 "\t-qr\tPerform both Householders reflections and Givens Rotations " +
                 "to find the QR decomposition of a matrix (include file path)\n" +
+                "\t-solve\tSolve for x in Ax = b given an augmented matrix A|b\n" +
                 "\t-h\tPrint this help message\n";
         System.out.println(s);
     }
